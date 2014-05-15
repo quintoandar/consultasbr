@@ -177,7 +177,7 @@ public class SimpleHttpQuerier {
 		return ck;
 	}
 
-	public boolean shouldPersistCookie(BasicClientCookie ck) {
+	protected boolean shouldPersistCookie(BasicClientCookie ck) {
 		return false;
 	}
 
@@ -258,12 +258,12 @@ public class SimpleHttpQuerier {
 		return null;
 	}
 
-	public void novoCookie(String name, String value) {
+	protected void novoCookie(String name, String value) {
 		Cookie ck = new BasicClientCookie(name, value);
 		client.getCookieStore().addCookie(ck);
 	}
 
-	public String getCookieValue(String string) {
+	protected String getCookieValue(String string) {
 		if (client.getCookieStore() != null) {
 			for (Cookie ck : client.getCookieStore().getCookies()) {
 				if (ck.getName().equals(string)) {
@@ -274,7 +274,7 @@ public class SimpleHttpQuerier {
 		return null;
 	}
 
-	public void attachCookiesFromStore(AbstractHttpMessage ahm) {
+	protected void attachCookiesFromStore(AbstractHttpMessage ahm) {
 		StringBuffer cookieHeaderStr = new StringBuffer();
 		for (Cookie c : client.getCookieStore().getCookies()) {
 			cookieHeaderStr.append(c.getName()).append("=").append(c.getValue()).append("; ");

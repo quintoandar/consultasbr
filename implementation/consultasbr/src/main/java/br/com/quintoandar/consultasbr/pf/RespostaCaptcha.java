@@ -1,7 +1,7 @@
 package br.com.quintoandar.consultasbr.pf;
 import java.io.Serializable;
 
-public class CaptchaAnswer implements Serializable {
+public class RespostaCaptcha implements Serializable {
 
 	private static final long serialVersionUID = -6637625240418627035L;
 
@@ -9,13 +9,13 @@ public class CaptchaAnswer implements Serializable {
 
 	private byte[] captchaImage;
 
-	public CaptchaAnswer(String sessionId, byte[] captachImage) {
+	public RespostaCaptcha(String sessionId, byte[] captachImage) {
 		super();
 		this.sessionId = sessionId;
 		this.captchaImage = captachImage;
 	}
 	
-	public CaptchaAnswer(String sessionId){
+	public RespostaCaptcha(String sessionId){
 		this(sessionId,null);
 	}
 

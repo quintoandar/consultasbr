@@ -26,7 +26,7 @@ public class ConsultarPFTest {
 
 	@Test
 	public void testConsultaFernandinhoBeiraMar() {
-		CaptchaAnswer captcha = consultarPF.requestCaptcha();
+		RespostaCaptcha captcha = consultarPF.requestCaptcha();
 
 		String respCaptcha = solveCaptcha("Luiz Fernando da Costa", captcha.getCaptchaImage());
 
@@ -42,7 +42,7 @@ public class ConsultarPFTest {
 
 	@Test
 	public void testConsultaLula() {
-		CaptchaAnswer captcha = consultarPF.requestCaptcha();
+		RespostaCaptcha captcha = consultarPF.requestCaptcha();
 
 		String respCaptcha = solveCaptcha("Luis Inácio Lula da Silva", captcha.getCaptchaImage());
 
@@ -56,7 +56,7 @@ public class ConsultarPFTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoSessionId() {
-		CaptchaAnswer captcha = new CaptchaAnswer(null);
+		RespostaCaptcha captcha = new RespostaCaptcha(null);
 
 		String respCaptcha = null;
 		ConsultaAntecedentes con = captcha.consulta(respCaptcha, "Luis Inácio Lula da Silva");
@@ -65,7 +65,7 @@ public class ConsultarPFTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoRespostaCaptcha() {
-		CaptchaAnswer captcha = consultarPF.requestCaptcha();
+		RespostaCaptcha captcha = consultarPF.requestCaptcha();
 
 		String respCaptcha = null;
 		ConsultaAntecedentes con = captcha.consulta(respCaptcha, "Luis Inácio Lula da Silva");

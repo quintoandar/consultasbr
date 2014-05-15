@@ -31,18 +31,18 @@ public class ConsultarPF extends SimpleHttpQuerier {
 		return super.shouldPersistCookie(ck);
 	}
 
-	public CaptchaAnswer requestCaptcha() {
+	public RespostaCaptcha requestCaptcha() {
 		HttpGet httpGet = new HttpGet("https://servicos.dpf.gov.br/sinic-certidao/jcaptcha");
 		httpGet.setHeader("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0");
 
 		client.getCookieStore().clear();
 		try {
 			HttpResponse resp = client.execute(httpGet);
-			CaptchaAnswer captchaAnswer = new CaptchaAnswer(getCookieValue(JSESSIONID_COOKIE_KEY));
+			RespostaCaptcha captchaAnswer = new RespostaCaptcha(getCookieValue(JSESSIONID_COOKIE_KEY));
 			if (resp.getStatusLine().getStatusCode() == 200 && resp.getEntity().getContentType().getValue().equalsIgnoreCase("image/jpeg")) {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				resp.getEntity().writeTo(baos);
-				captchaAnswer = new CaptchaAnswer(getCookieValue(JSESSIONID_COOKIE_KEY),baos.toByteArray());
+				captchaAnswer = new RespostaCaptcha(getCookieValue(JSESSIONID_COOKIE_KEY),baos.toByteArray());
 			}
 			return captchaAnswer;
 		} catch (Throwable e) {
