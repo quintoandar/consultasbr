@@ -1,10 +1,5 @@
 package br.com.quintoandar.consultasbr.pf;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,32 +162,4 @@ public class ConsultarPF extends SimpleHttpQuerier {
 		}
 		return null;
 	}
-
-	public static void main(String[] args) throws IOException {
-		ConsultarPF consultaPF = new ConsultarPF();
-
-//		String sessionId = consultaPF.requestCaptcha(consultaPF.requestCaptcha(null));
-		CaptchaAnswer captcha = consultaPF.requestCaptcha();
-		
-		ByteArrayInputStream bais = new ByteArrayInputStream(captcha.getCaptchaImage());
-		FileOutputStream fos = new FileOutputStream("/home/moa/captcha.jpg");
-		byte[] buf = null;
-		while(bais.available() > 0){
-			buf = new byte[bais.available() < 1024 ? bais.available() : 1024];
-			bais.read(buf);
-			fos.write(buf);
-		}
-		fos.close();
-		
-		System.out.println(captcha.getSessionId()+" Enter captcha: ");
-		BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-		String respCaptcha = bufferRead.readLine();
-
-//		ConsultaAntecedentes con = captcha.consulta(respCaptcha,"Luiz Fernando da Costa");//fernandinho beira mar
-		ConsultaAntecedentes con = captcha.consulta(respCaptcha,"Luis Inácio Lula da Silva");
-		ResultadoAntecedentes ra = consultaPF.consultarAntecedentes(con);
-		System.out.println("Status: "+ra.getStatus());
-	}
-
-
 }
