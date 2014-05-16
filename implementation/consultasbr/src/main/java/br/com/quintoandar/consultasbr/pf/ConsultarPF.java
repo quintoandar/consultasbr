@@ -139,11 +139,14 @@ public class ConsultarPF extends SimpleHttpQuerier {
 			} else {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				resp.getEntity().writeTo(baos);
-				String contentAsString = new String(baos.toByteArray(),ENCODING).replaceAll("[\n\r]","");
+				String contentAsString = new String(baos.toByteArray(),ENCODING);
 				baos.close();
 				baos = null;
-//				
+//				ra
 				ResultadoAntecedentes ra = new ResultadoAntecedentes();
+				ra.setPdf(getHtmlWithBase(contentAsString, ENCODING,"https://servicos.dpf.gov.br/sinic-certidao/"));
+
+				contentAsString = contentAsString.replaceAll("[\n\r]","");
 				
 				if(contentAsString.matches(".*Não foi possível emitir a Certidão de Antecedentes Criminais com base nos dados informados.*")){
 					String codRef = contentAsString.replaceAll("^.*Apresente o seguinte protocolo : ([0-9A-Za-z]*?) .*$", "$1");

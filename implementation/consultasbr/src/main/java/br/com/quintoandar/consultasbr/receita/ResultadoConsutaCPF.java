@@ -10,6 +10,8 @@ public class ResultadoConsutaCPF implements Serializable {
 	private String codComprovante;
 
 	private StatusCPF status = StatusCPF.INVALIDO;
+	
+	private byte[] pdf;
 
 	public String getNome() {
 		return nome;
@@ -34,6 +36,12 @@ public class ResultadoConsutaCPF implements Serializable {
 	public void setStatus(StatusCPF status) {
 		this.status = status;
 	}
-	
-	
+
+	public byte[] getPdf() {
+		return pdf;
+	}
+
+	public void setPdf(byte[] pdf) {
+		this.pdf = pdf;
+	}
 }

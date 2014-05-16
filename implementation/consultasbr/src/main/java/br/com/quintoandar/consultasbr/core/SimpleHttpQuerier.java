@@ -1,8 +1,12 @@
 package br.com.quintoandar.consultasbr.core;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
@@ -281,6 +285,58 @@ public class SimpleHttpQuerier {
 		}
 		ahm.addHeader("Cookie", cookieHeaderStr.toString().trim().replaceAll(";$", ""));
 	}
+	
+//	public static byte[] getHtmlAsPDF(String contentAsString, String baseUrl) throws DocumentException, IOException {
+//		ByteArrayOutputStream pdfBaos = new ByteArrayOutputStream();
+//		ITextRenderer renderer = new ITextRenderer();
+//		
+//		
+//		contentAsString = contentAsString.replaceAll("^\\s*(\n\r|\r\n|\n|(<))","$2");
+//		contentAsString = contentAsString.replaceFirst("^(<!DOCTYPE .* PUBLIC \"[^\"]*\")>", "$1 \"\">");
+//		contentAsString = contentAsString.replaceAll("</?[bB][rR]/?>","<br></br>");
+//		contentAsString = Pattern.compile("(<(LINK|link|INPUT|input)[^>]*[^/]{0,1}>[^<]*)((?!</\\1))", Pattern.DOTALL).matcher(contentAsString).replaceAll("$1</$2>$3");
+//		contentAsString = StringEscapeUtils.unescapeHtml4(contentAsString);
+////		contentAsString = contentAsString.replaceAll("(<(LINK|link|INPUT|input)[^>/]*>[^<]*)((?!</\\1))","$1</$2>$3");
+////		contentAsString = contentAsString.replaceAll("<([oOuU][lL])>([^<]*)","<$1>$2");
+//		System.out.println(contentAsString);
+//		
+//		renderer.setDocumentFromString(contentAsString,baseUrl);
+//		renderer.layout();
+//		renderer.createPDF(pdfBaos);
+//		pdfBaos.close();
+//		byte[] byteArray = pdfBaos.toByteArray();
+//		pdfBaos = null;
+//		return byteArray;
+//	}
+	
+	public static byte[] getHtmlWithBase(String contentAsString, String charset, String baseUrl) throws IOException {
+//		ByteArrayOutputStream pdfBaos = new ByteArrayOutputStream();
+//		ITextRenderer renderer = new ITextRenderer();
+		
+		
+//		contentAsString = contentAsString.replaceAll("^\\s*(\n\r|\r\n|\n|(<))","$2");
+//		contentAsString = contentAsString.replaceFirst("^(<!DOCTYPE .* PUBLIC \"[^\"]*\")>", "$1 \"\">");
+//		contentAsString = contentAsString.replaceAll("</?[bB][rR]/?>","<br></br>");
+//		contentAsString = Pattern.compile("(<(LINK|link|INPUT|input)[^>]*[^/]{0,1}>[^<]*)((?!</\\1))", Pattern.DOTALL).matcher(contentAsString).replaceAll("$1</$2>$3");
+//		contentAsString = StringEscapeUtils.unescapeHtml4(contentAsString);
+//		contentAsString = contentAsString.replaceAll("(<(LINK|link|INPUT|input)[^>/]*>[^<]*)((?!</\\1))","$1</$2>$3");
+//		contentAsString = contentAsString.replaceAll("<([oOuU][lL])>([^<]*)","<$1>$2");
+
+		String baseDomain = baseUrl.replaceAll("^(https?://([^/]+:?[^/]*)/?).*$", "$1");
+		contentAsString = contentAsString.replaceAll("(src|href)=(\"|')\\./(.*?)\\2", "$1=$2"+baseUrl+"$3$2");
+		contentAsString = contentAsString.replaceAll("(src|href)=(\"|')/?((?!http://))(.*?)\\2", "$1=$2"+baseDomain+"$3$4$2");
+		
+//		System.out.println(contentAsString);
+		
+//		renderer.setDocumentFromString(contentAsString,baseUrl);
+//		renderer.layout();
+//		renderer.createPDF(pdfBaos);
+//		pdfBaos.close();
+//		byte[] byteArray = pdfBaos.toByteArray();
+//		pdfBaos = null;
+//		return byteArray;
+		return contentAsString.getBytes(charset);
+	}
 
 	public static int copy(InputStream is, OutputStream out, int maxTries) throws IOException, InterruptedException {
 		int tries = 0;
@@ -309,4 +365,24 @@ public class SimpleHttpQuerier {
 		}
 		return totalRead;
 	}
+	
+	public static void main(String[] args) throws Throwable {
+//		String contentAsString ="\n     \n\r   \t   \r\n   \n   \n    \n       \t <!DOCTYPE persistence PUBLIC \"http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd\">\nasdasd\nasas";
+////		contentAsString = Pattern.compile("^\\s*(\n\r|\r\n|\n)").matcher(contentAsString).replaceAll("");
+//		contentAsString = contentAsString.replaceAll("^\\s*(\n\r|\r\n|\n|(<))","$2");
+//		contentAsString = contentAsString.replaceFirst("^(<!DOCTYPE .* PUBLIC \"[^\"]*\")>", "$1 \"\">");
+//		System.out.println(contentAsString);
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		copy(new URL("file:///home/moa/bla.html").openStream(), out, 1);
+		out.close();
+		
+		String str = new String(out.toByteArray());
+		
+		ByteArrayInputStream bais = new ByteArrayInputStream(getHtmlWithBase(str, "ISO-8859-1", "http://www.receita.fazenda.gov.br/aplicacoes/atcta/cpf/"));
+		FileOutputStream fos = new FileOutputStream("/home/moa/pdf.html");
+		copy(bais, fos, 1);
+		fos.close();
+		
+	}
 }
+

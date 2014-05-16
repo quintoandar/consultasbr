@@ -30,9 +30,7 @@ public class ConsultarPFTest {
 
 		String respCaptcha = solveCaptcha("Luiz Fernando da Costa", captcha.getCaptchaImage());
 
-		ConsultaAntecedentes con = captcha.consulta(respCaptcha, "Luiz Fernando da Costa");// fernandinho
-																							// beira
-																							// mar
+		ConsultaAntecedentes con = captcha.consulta(respCaptcha, "Luiz Fernando da Costa");// fernandinho beira mar
 
 		ResultadoAntecedentes ra = consultarPF.consultarAntecedentes(con);
 		Assert.assertEquals(StatusAntecedentes.VerificarComPF, ra.getStatus());

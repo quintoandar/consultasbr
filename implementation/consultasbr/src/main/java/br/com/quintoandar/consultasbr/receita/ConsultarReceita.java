@@ -84,8 +84,10 @@ public class ConsultarReceita extends SimpleHttpQuerier {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				resp.getEntity().writeTo(baos);
 				baos.close();
-
 				String contentAsString = new String(baos.toByteArray(), ENCODING).replaceAll("[\n\r]", "");
+				
+				res.setPdf(getHtmlWithBase(contentAsString,ENCODING,"http://www.receita.fazenda.gov.br"));
+				
 				Document doc = Jsoup.parse(contentAsString.replaceAll("&nbsp;", " "));
 				baos = null;
 				contentAsString = null;
