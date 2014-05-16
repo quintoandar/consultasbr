@@ -82,13 +82,16 @@ public class ConsultarTJSP extends SimpleHttpQuerier {
 						res.setTipo(StringEscapeUtils.unescapeHtml4(tipoBuild.toString()).trim());
 
 						Elements nuProcSiblings = nuProcesso.siblingElements().select("div.espacamentoLinhas");
-						String envNome = nuProcSiblings.get(0).text();
-						res.setEnvolvimento(envNome.substring(0, envNome.indexOf(':')).trim());
-						res.setNome(envNome.substring(envNome.indexOf(':') + 1, envNome.length()).trim());
-
-						String dataEVara = nuProcSiblings.get(1).text().replaceAll("^.*?:", "");
-						res.setRecebidoEm(sdfRecebido.parse(dataEVara.split("-")[0].trim()));
-						res.setVara(dataEVara.split("-")[1].trim());
+						if(nuProcSiblings.size() > 0){
+							String envNome = nuProcSiblings.get(0).text();
+							res.setEnvolvimento(envNome.substring(0, envNome.indexOf(':')).trim());
+							res.setNome(envNome.substring(envNome.indexOf(':') + 1, envNome.length()).trim());
+						}
+						if(nuProcSiblings.size() > 1){
+							String dataEVara = nuProcSiblings.get(1).text().replaceAll("^.*?:", "");
+							res.setRecebidoEm(sdfRecebido.parse(dataEVara.split("-")[0].trim()));
+							res.setVara(dataEVara.split("-")[1].trim());
+						}
 
 						Element link = nuProcesso.select("a.linkProcesso").get(0);
 						res.setCodigoProcesso(link.ownText());
