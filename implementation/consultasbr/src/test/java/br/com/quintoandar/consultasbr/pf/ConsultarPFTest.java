@@ -35,7 +35,7 @@ public class ConsultarPFTest {
 		ResultadoAntecedentes ra = consultarPF.consultarAntecedentes(con);
 		Assert.assertEquals(StatusAntecedentes.VerificarComPF, ra.getStatus());
 		Assert.assertNotNull(ra.getProtocolo());
-		Assert.assertNull(ra.getPdf());
+		Assert.assertNotNull(ra.getPdf());
 	}
 
 	@Test
