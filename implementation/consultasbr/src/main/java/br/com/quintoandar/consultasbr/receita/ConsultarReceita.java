@@ -110,6 +110,10 @@ public class ConsultarReceita extends SimpleHttpQuerier {
 						res.setCodComprovante(el.text().split(":")[1].trim());
 					}
 				}
+			} else if(resp.getStatusLine().getStatusCode() == 302 && resp.containsHeader("Location")){
+				if( resp.getFirstHeader("Location").getValue().contains("Error=1")){
+					res.setStatus(StatusCPF.CAPTCHA_INVALIDO);
+				}
 			}
 		} catch (Throwable e) {
 			log.error("Erro", e);
