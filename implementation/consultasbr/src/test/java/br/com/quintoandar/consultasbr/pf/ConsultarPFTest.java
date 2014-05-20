@@ -52,6 +52,21 @@ public class ConsultarPFTest {
 		Assert.assertNotNull(ra.getPdf());
 	}
 
+	@Test
+	public void testWrongCaptcha() {
+		RespostaCaptcha captcha = consultarPF.requestCaptcha();
+
+//		String respCaptcha = solveCaptcha("Luis Inácio Lula da Silva", captcha.getCaptchaImage());
+		String respCaptcha = "XXXXXX";
+
+		ConsultaAntecedentes con = captcha.consulta(respCaptcha, "Luis Inácio Lula da Silva");
+
+		ResultadoAntecedentes ra = consultarPF.consultarAntecedentes(con);
+		Assert.assertEquals(StatusAntecedentes.CaptchaInvalido, ra.getStatus());
+		Assert.assertNull(ra.getProtocolo());
+		Assert.assertNull(ra.getPdf());
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoSessionId() {
 		RespostaCaptcha captcha = new RespostaCaptcha(null);

@@ -83,7 +83,7 @@ public class ConsultarPF extends SimpleHttpQuerier {
 				String cod = contentAsString.replaceAll("^.*value='([0-9A-Za-z]*)';.*$", "$1");
 				contentAsString = null;
 				
-				return cod;
+				return ((cod == null || cod.equalsIgnoreCase("null") )? null : cod);
 			}
 			return getCookieValue(resp.getAllHeaders(), JSESSIONID_COOKIE_KEY);
 		} catch (Throwable e) {
@@ -103,6 +103,11 @@ public class ConsultarPF extends SimpleHttpQuerier {
 			throw new IllegalArgumentException("RespostaCaptcha must be specified");
 		}
 		String cod = resolverCaptcha(consulta.getSessionId(), consulta.getRespostaCaptcha(), consulta.getNome());
+		if(cod == null){
+			ResultadoAntecedentes ra = new ResultadoAntecedentes();
+			ra.setStatus(StatusAntecedentes.CaptchaInvalido);
+			return ra;
+		}
 		return consultarAntecedentes(consulta.getSessionId(), cod, consulta.getNome(), consulta.getCpf());
 	}
 
