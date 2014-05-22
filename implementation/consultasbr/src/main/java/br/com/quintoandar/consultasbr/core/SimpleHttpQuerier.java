@@ -323,8 +323,8 @@ public class SimpleHttpQuerier {
 //		contentAsString = contentAsString.replaceAll("<([oOuU][lL])>([^<]*)","<$1>$2");
 
 		String baseDomain = baseUrl.replaceAll("^(https?://([^/]+:?[^/]*)/?).*$", "$1");
-		contentAsString = contentAsString.replaceAll("(src|href)=(\"|')\\./(.*?)\\2", "$1=$2"+baseUrl+"$3$2");
-		contentAsString = contentAsString.replaceAll("(src|href)=(\"|')/?((?!http://))(.*?)\\2", "$1=$2"+baseDomain+"$3$4$2");
+		contentAsString = contentAsString.replaceAll("(SRC|src|href|HREF)=(\"|')\\./(.*?)\\2", "$1=$2"+baseUrl+"$3$2");
+		contentAsString = contentAsString.replaceAll("(SRC|src|href|HREF)=(\"|')/?((?!http://))(.*?)\\2", "$1=$2"+baseDomain+"$3$4$2");
 		
 //		System.out.println(contentAsString);
 		
