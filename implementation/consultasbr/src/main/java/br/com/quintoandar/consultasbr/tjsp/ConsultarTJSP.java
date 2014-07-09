@@ -30,18 +30,38 @@ public class ConsultarTJSP extends SimpleHttpQuerier {
 	public ResultadoConsulta consultarNome(String nome, boolean porNomeCompleto) {
 		return consultarNome(nome, true, 1);
 	}
-
+	
 	public ResultadoConsulta consultarNome(String nome, boolean porNomeCompleto, Integer pagina) {
 		Map<String, String> map = new HashMap<String, String>();
-
-		map.put("paginaConsulta", pagina.toString());
-		map.put("localPesquisa.cdLocal", "-1");
 		map.put("cbPesquisa", "NMPARTE");
-		map.put("tipoNuProcesso", "UNIFICADO");
 		map.put("dePesquisa", nome);
 		if (porNomeCompleto) {
 			map.put("chNmCompleto", "true");
 		}
+		return consultar(map,pagina);
+	}
+
+	/**
+	 * 
+	 * @param cpfOuCnpj
+	 * @param pagina
+	 * @return
+	 */
+	public ResultadoConsulta consultarDocumento(String cpfOuCnpj, Integer pagina) {
+		Map<String, String> map = new HashMap<String, String>();
+		map.put("cbPesquisa", "DOCPARTE");
+		map.put("dePesquisa", cpfOuCnpj.replaceAll("[^0-9A-Za-z]", ""));
+		return consultar(map,pagina);
+	}
+
+	public ResultadoConsulta consultar(Map<String, String> mapParams, Integer pagina) {
+		Map<String, String> map = new HashMap<String, String>();
+
+		map.put("paginaConsulta", pagina.toString());
+		map.put("localPesquisa.cdLocal", "-1");
+		map.put("tipoNuProcesso", "UNIFICADO");
+		map.putAll(mapParams);
+		
 		String searchUrl = "http://esaj.tjsp.jus.br/cpo/pg/search.do" + asQueryParams(map, ENCODING);
 		HttpGet httpGet = new HttpGet(searchUrl);
 		httpGet.addHeader("Accept", "text/html");
