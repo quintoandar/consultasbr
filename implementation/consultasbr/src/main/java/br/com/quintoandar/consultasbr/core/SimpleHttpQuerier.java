@@ -377,9 +377,10 @@ public class SimpleHttpQuerier {
 	 * Usa o Jsoup internamente para busca forms e seus elementos de formularios, gerando um mapa com os valores pré-preenchidos.
 	 * @param htmlPage o conteudo html
 	 * @param formSelector seletor css
+	 * @param removeEmptyFields TODO
 	 * @return mapa cujas chaves sao os 'name's dos campos.
 	 */
-	public static Map<String, List<String>> getForm(String htmlPage,String formSelector){
+	public static Map<String, List<String>> getForm(String htmlPage,String formSelector, boolean removeEmptyFields){
 		Map<String, List<String>> map = new HashMap<String, List<String>>();
 		Document doc = Jsoup.parse(htmlPage);
 		Elements els = doc.select(formSelector == null?"form":formSelector);
@@ -387,7 +388,7 @@ public class SimpleHttpQuerier {
 			Elements frmEls = e.select("input,select,textarea");
 			for (Element frmEl : frmEls) {
 				if (frmEl.hasAttr("name")) {
-					if (frmEl.hasAttr("value") || frmEl.tag().toString().equals(Tag.SELECT.toString())) {
+					if (!removeEmptyFields || frmEl.hasAttr("value") || frmEl.tag().toString().equals(Tag.SELECT.toString())) {
 						if (!map.containsKey(frmEl.attr("name"))) {
 							map.put(frmEl.attr("name"), Arrays.asList(frmEl.attr("value")));
 						} else {
