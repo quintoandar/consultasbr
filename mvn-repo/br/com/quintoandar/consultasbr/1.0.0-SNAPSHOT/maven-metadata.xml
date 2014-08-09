@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata>
+<metadata modelVersion="1.1.0">
   <groupId>br.com.quintoandar</groupId>
   <artifactId>consultasbr</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <versioning>
     <snapshot>
-      <timestamp>20140709.223135</timestamp>
-      <buildNumber>5</buildNumber>
+      <timestamp>20140809.172930</timestamp>
+      <buildNumber>6</buildNumber>
     </snapshot>
-    <lastUpdated>20140709223135</lastUpdated>
+    <lastUpdated>20140809172930</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.0.0-20140809.172930-6</value>
+        <updated>20140809172930</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0.0-20140809.172930-6</value>
+        <updated>20140809172930</updated>
+      </snapshotVersion>
+    </snapshotVersions>
   </versioning>
 </metadata>

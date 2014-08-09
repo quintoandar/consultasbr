@@ -2,11 +2,10 @@
 <metadata>
   <groupId>br.com.quintoandar</groupId>
   <artifactId>consultasbr</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <versioning>
     <versions>
       <version>1.0.0-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20140709223135</lastUpdated>
+    <lastUpdated>20140809172930</lastUpdated>
   </versioning>
 </metadata>
