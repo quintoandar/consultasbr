@@ -14,12 +14,15 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+
+import javax.swing.text.html.HTML.Tag;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -45,6 +48,10 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.AbstractHttpMessage;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -364,6 +371,33 @@ public class SimpleHttpQuerier {
 			totalRead += buf.length;
 		}
 		return totalRead;
+	}
+	
+	/**
+	 * Usa o Jsoup internamente para busca forms e seus elementos de formularios, gerando um mapa com os valores pré-preenchidos.
+	 * @param htmlPage o conteudo html
+	 * @param formSelector seletor css
+	 * @return mapa cujas chaves sao os 'name's dos campos.
+	 */
+	public static Map<String, List<String>> getForm(String htmlPage,String formSelector){
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
+		Document doc = Jsoup.parse(htmlPage);
+		Elements els = doc.select(formSelector == null?"form":formSelector);
+		for (Element e : els) {
+			Elements frmEls = e.select("input,select,textarea");
+			for (Element frmEl : frmEls) {
+				if (frmEl.hasAttr("name")) {
+					if (frmEl.hasAttr("value") || frmEl.tag().toString().equals(Tag.SELECT.toString())) {
+						if (!map.containsKey(frmEl.attr("name"))) {
+							map.put(frmEl.attr("name"), Arrays.asList(frmEl.attr("value")));
+						} else {
+							map.get(frmEl.attr("name")).add(frmEl.attr("value"));
+						}
+					}
+				}
+			}
+		}
+		return map;
 	}
 	
 	public static void main(String[] args) throws Throwable {
