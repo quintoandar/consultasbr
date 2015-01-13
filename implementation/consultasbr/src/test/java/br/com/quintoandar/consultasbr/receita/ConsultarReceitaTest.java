@@ -47,9 +47,9 @@ public class ConsultarReceitaTest {
 		RespostaCaptcha captcha = consultarReceita.requestCaptcha();
 		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, solveCaptcha(nomeAdalberto, captcha.getCaptchaImage()), "18530249100");
 		assertNotNull(res);
-		assertEquals(nomeAdalberto, res.getNome().toUpperCase());
 		assertNotEquals(StatusCPF.INVALIDO, res.getStatus());
 		assertNotEquals(StatusCPF.CAPTCHA_INVALIDO, res.getStatus());
+		assertEquals(nomeAdalberto, res.getNome().toUpperCase());
 	}
 
 }

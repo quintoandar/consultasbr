@@ -273,12 +273,21 @@ public class SimpleHttpQuerier {
 		Cookie ck = new BasicClientCookie(name, value);
 		client.getCookieStore().addCookie(ck);
 	}
-
+	
 	protected String getCookieValue(String string) {
+		Cookie ck = getCookieValue(string, false);
+		if(ck != null){
+			return ck.getValue();
+		}
+		return null;
+	}
+
+	protected Cookie getCookieValue(String string, boolean regExp) {
 		if (client.getCookieStore() != null) {
 			for (Cookie ck : client.getCookieStore().getCookies()) {
-				if (ck.getName().equals(string)) {
-					return ck.getValue();
+				
+				if (regExp ? ck.getName().matches(string) : ck.getName().equals(string)) {
+					return ck;
 				}
 			}
 		}
