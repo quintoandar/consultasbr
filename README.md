@@ -48,7 +48,7 @@ public class CPFTeste {
     
     //Shows a dialog with the captcha image to be solved
     JLabel jLabel = new JLabel(new ImageIcon(captcha.getCaptchaImage()));
-		jLabel.setText("Testing for: " + name);
+		jLabel.setText("Solve captcha");
 		String captchaSolution = JOptionPane.showInputDialog(jLabel);
 		
 		ResultadoConsutaCPF res = consultar.consultarCPF(captcha,captchaSolution,"12345678909");
