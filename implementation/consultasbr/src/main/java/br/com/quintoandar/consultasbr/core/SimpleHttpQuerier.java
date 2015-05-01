@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
@@ -58,7 +59,9 @@ import org.slf4j.LoggerFactory;
 public class SimpleHttpQuerier {
 	private static final Logger log = LoggerFactory.getLogger(SimpleHttpQuerier.class);
 
-	private static SimpleDateFormat sdfEn = new SimpleDateFormat("EEE', 'dd-MMM-yyyy HH:mm:ss z");
+	private static SimpleDateFormat sdfEn = new SimpleDateFormat("EEE', 'dd-MMM-yyyy HH:mm:ss z",Locale.US);
+	
+	private static SimpleDateFormat sdfBr = new SimpleDateFormat("EEE', 'dd-MMM-yyyy HH:mm:ss z",new Locale("pt","BR"));
 
 	static {
 		sdfEn.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -179,7 +182,7 @@ public class SimpleHttpQuerier {
 				ck.setExpiryDate(sdfEn.parse(cookieMap.get("expires")));
 			} catch (ParseException e) {
 				try {
-					ck.setExpiryDate(sdfEn.parse(cookieMap.get("expires")));
+					ck.setExpiryDate(sdfBr.parse(cookieMap.get("expires")));
 				} catch (ParseException e2) {
 					log.error("Error parsing cookie expiration date", e);
 					log.error("Error parsing cookie expiration date", e2);

@@ -51,10 +51,15 @@ public class IGPMReader extends SimpleHttpQuerier {
 			resp.getEntity().writeTo(baos);
 			String retorno = new String(baos.toByteArray(), "ISO-8859-1");
 			Document doc = Jsoup.parse(retorno);
-			Elements media = doc.select("script[src^=if_inflacao/igp_m]");
+			Elements media = doc.select("script[src*=if_inflacao/igp_m]");
 			Element ultimoIgpm = media.get(0);
 
-			httpGet = new HttpGet(HTTP_PORTALDEFINANCAS_COM+ultimoIgpm.attr("src"));
+			String scriptSrc = ultimoIgpm.attr("src").trim();
+			if(scriptSrc.matches("^/.*")){
+				scriptSrc = HTTP_PORTALDEFINANCAS_COM+scriptSrc;
+			}
+			
+			httpGet = new HttpGet(scriptSrc);
 			httpGet.setHeader("User-Agent", USER_AGENT);
 			httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
 			httpGet.setHeader("Accept-Language", "en-US,en;q=0.8");
@@ -120,8 +125,11 @@ public class IGPMReader extends SimpleHttpQuerier {
 	
 	
 
-//	public static void main(String[] args) {
-//		IGPMReader r = new IGPMReader();
-//		r.processar();
-//	}
+	public static void main(String[] args) {
+		IGPMReader r = new IGPMReader();
+		r.processar();
+		System.out.println(r.getMes());
+		System.out.println(r.getAcumulado());
+		System.out.println(r.getMensal());
+	}
 }
