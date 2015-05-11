@@ -51,7 +51,7 @@ public class IGPMReader extends SimpleHttpQuerier {
 			resp.getEntity().writeTo(baos);
 			String retorno = new String(baos.toByteArray(), "ISO-8859-1");
 			Document doc = Jsoup.parse(retorno);
-			Elements media = doc.select("script[src*=if_inflacao/igp_m]");
+			Elements media = doc.select("script[src*=js-inf/igp-m-fgv]");
 			Element ultimoIgpm = media.get(0);
 
 			String scriptSrc = ultimoIgpm.attr("src").trim();
