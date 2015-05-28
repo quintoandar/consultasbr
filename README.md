@@ -76,4 +76,23 @@ public class IGPMTeste {
 	}
 }
 ```
+### IPTU SP
+
+```java
+public class IGPMTeste {
+  public static void main(String[] args) {
+    ConsultarIptuSP crawler = new ConsultarIptuSP();
+    String taxpayerCode = ""; //SP city code, like "000.000.0000-0"
+    int parcelNumber = 5;
+    int year = 2014;
+    try {
+      Resposta2ViaIPTU resp = crawler.buscar2aViaIPTU(taxpayerCode, parcelNumber, year);
+      System.out.println(String.format("Boleto: %s",resp.getCodigo()));
+      System.out.println(String.format("Valor: %f",resp.getValor()));
+    } catch (Throwable t){
+      System.out.println("Error testes. " + t.getMessage() + t.getStackTrace());
+    }
+  }
+}
+```
  You can also check the tests to see how to use all the different types of consultas.
