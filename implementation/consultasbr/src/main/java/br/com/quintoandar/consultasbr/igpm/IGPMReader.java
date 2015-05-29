@@ -55,8 +55,8 @@ public class IGPMReader extends SimpleHttpQuerier {
 			Element ultimoIgpm = media.get(0);
 
 			String scriptSrc = ultimoIgpm.attr("src").trim();
-			if(scriptSrc.matches("^/.*")){
-				scriptSrc = HTTP_PORTALDEFINANCAS_COM+scriptSrc;
+			if(scriptSrc.matches("^/.*") || !scriptSrc.matches("^(www|http://).*")){
+				scriptSrc = HTTP_PORTALDEFINANCAS_COM.replaceAll("/+$","")+"/"+scriptSrc.replaceAll("^/+","");
 			}
 			
 			httpGet = new HttpGet(scriptSrc);
