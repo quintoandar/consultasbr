@@ -17,6 +17,8 @@ public class Resposta2ViaIPTU implements Serializable {
 	private Date vencimento;
 	
 	private byte[] dado;
+	
+	private Double valor;
 
 	public Resposta2ViaIPTU(String codigoContribuinte, Integer anoExercicio, Integer numParcela) {
 		super();
@@ -71,6 +73,14 @@ public class Resposta2ViaIPTU implements Serializable {
 
 	public void setDado(byte[] dado) {
 		this.dado = dado;
+	}
+
+	public Double getValor() {
+		return valor;
+	}
+
+	public void setValor(Double valor) {
+		this.valor = valor;
 	}
 	
 	
