@@ -2,6 +2,9 @@ package br.com.quintoandar.consultasbr.receita;
 
 import static org.junit.Assert.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -34,18 +37,18 @@ public class ConsultarReceitaTest {
 	}
 
 	@Test
-	public void testWrongCaptcha() {
+	public void testWrongCaptcha() throws ParseException {
 		RespostaCaptcha captcha = consultarReceita.requestCaptcha();
-		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, "XXXXXX", "18530249100");
+		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, "XXXXXX", "18530249100", new SimpleDateFormat("dd/MM/yyyy").parse("28/10/1958"));
 		assertNotNull(res);
 		assertEquals(StatusCPF.CAPTCHA_INVALIDO, res.getStatus());
 	}
 
 	@Test
-	public void testConsultaAdalberto() {
+	public void testConsultaAdalberto() throws ParseException {
 		String nomeAdalberto = "ADALBERTO ALVES DIAS";
 		RespostaCaptcha captcha = consultarReceita.requestCaptcha();
-		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, solveCaptcha(nomeAdalberto, captcha.getCaptchaImage()), "18530249100");
+		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, solveCaptcha(nomeAdalberto, captcha.getCaptchaImage()), "185.302.491-00",  new SimpleDateFormat("dd/MM/yyyy").parse("28/10/1958"));
 		assertNotNull(res);
 		assertNotEquals(StatusCPF.INVALIDO, res.getStatus());
 		assertNotEquals(StatusCPF.CAPTCHA_INVALIDO, res.getStatus());

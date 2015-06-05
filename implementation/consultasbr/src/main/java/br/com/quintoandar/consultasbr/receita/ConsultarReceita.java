@@ -3,6 +3,8 @@ package br.com.quintoandar.consultasbr.receita;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
@@ -92,18 +94,23 @@ public class ConsultarReceita extends SimpleHttpQuerier {
 		return null;
 	}
 
-	public ResultadoConsutaCPF consultarCPF(RespostaCaptcha captcha, String respCaptcha, String cpf) {
+	public ResultadoConsutaCPF consultarCPF(RespostaCaptcha captcha, String respCaptcha, String cpf, Date dataNascimento) {
 		if (captcha.getSessionId() == null) {
 			throw new IllegalArgumentException("cookie must be specified");
 		}
-		return consultarCPF(captcha.getSessionId(), respCaptcha, cpf != null ? cpf.replaceAll("[^0-9]", "") : cpf);
+		return consultarCPF(captcha.getSessionId(), respCaptcha, cpf, dataNascimento);
 	}
 
-	private ResultadoConsutaCPF consultarCPF(String sessionId, String respCaptcha, String cpf) {
+	private ResultadoConsutaCPF consultarCPF(String sessionId, String respCaptcha, String cpf, Date dataNascimento) {
 		HttpPost httpPost = new HttpPost("http://www.receita.fazenda.gov.br/aplicacoes/atcta/cpf/ConsultaPublicaExibir.asp");
 
 		ResultadoConsutaCPF res = new ResultadoConsutaCPF();
-		httpPost.setEntity(asKeyValueEntity(ENCODING, "txtCPF", cpf, "txtTexto_captcha_serpro_gov_br", respCaptcha, "Enviar", "Consultar"));
+		httpPost.setEntity(asKeyValueEntity(ENCODING, 
+				"tempTxtCPF", cpf, 
+				"txtTexto_captcha_serpro_gov_br", respCaptcha, 
+				"tempTxtNascimento", new SimpleDateFormat("dd/MM/yyyy").format(dataNascimento),
+				"temptxtTexto_captcha_serpro_gov_br", respCaptcha, 
+				"Enviar", "Consultar"));
 		httpPost.addHeader(sessionId.replaceFirst("|.*$", ""), sessionId.replaceFirst("^.*|", ""));
 		try {
 			HttpResponse resp = client.execute(httpPost);
