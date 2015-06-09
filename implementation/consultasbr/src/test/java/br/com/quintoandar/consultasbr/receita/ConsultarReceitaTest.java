@@ -45,11 +45,14 @@ public class ConsultarReceitaTest {
 	}
 
 	@Test
-	public void testConsultaAdalberto() throws ParseException {
+	public void testConsultaAdalbertoWithNewClient() throws ParseException {
 		String nomeAdalberto = "ADALBERTO ALVES DIAS";
 		RespostaCaptcha captcha = consultarReceita.requestCaptcha();
+		
+		ConsultarReceita consultarReceita = new ConsultarReceita();
 		ResultadoConsutaCPF res = consultarReceita.consultarCPF(captcha, solveCaptcha(nomeAdalberto, captcha.getCaptchaImage()), "185.302.491-00",  new SimpleDateFormat("dd/MM/yyyy").parse("28/10/1958"));
 		assertNotNull(res);
+		assertNotNull(res.getStatus());
 		assertNotEquals(StatusCPF.INVALIDO, res.getStatus());
 		assertNotEquals(StatusCPF.CAPTCHA_INVALIDO, res.getStatus());
 		assertEquals(nomeAdalberto, res.getNome().toUpperCase());

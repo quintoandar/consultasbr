@@ -109,9 +109,14 @@ public class ConsultarReceita extends SimpleHttpQuerier {
 				"tempTxtCPF", cpf, 
 				"txtTexto_captcha_serpro_gov_br", respCaptcha, 
 				"tempTxtNascimento", new SimpleDateFormat("dd/MM/yyyy").format(dataNascimento),
+				"temptxtToken_captcha_serpro_gov_br", "", 
 				"temptxtTexto_captcha_serpro_gov_br", respCaptcha, 
 				"Enviar", "Consultar"));
-		httpPost.addHeader(sessionId.replaceFirst("|.*$", ""), sessionId.replaceFirst("^.*|", ""));
+		String name = sessionId.replaceFirst("^(.*)\\|.*$", "$1");
+		String value = sessionId.substring(name.length()+1,sessionId.length());
+		httpPost.addHeader(name, value);
+		novoCookie(name, value);
+		attachCookiesFromStore(httpPost);
 		try {
 			HttpResponse resp = client.execute(httpPost);
 			if (resp.getStatusLine().getStatusCode() == 200) {
