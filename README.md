@@ -29,7 +29,7 @@ Then add the dependency artifact:
   <dependency>
     <groupId>br.com.quintoandar</groupId>
     <artifactId>consultasbr</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
   </dependency>
   ...
 </dependencies>
@@ -51,7 +51,7 @@ public class CPFTeste {
 		jLabel.setText("Solve captcha");
 		String captchaSolution = JOptionPane.showInputDialog(jLabel);
 		
-		ResultadoConsutaCPF res = consultar.consultarCPF(captcha,captchaSolution,"12345678909");
+		ResultadoConsutaCPF res = consultar.consultarCPF(captcha,captchaSolution,"12345678909", new SimpleDateFormat("dd/MM/yyyy").parse("01/01/1970"));
     
 		if(res != null) {
       System.out.print("Status: " + res.getStatus());
