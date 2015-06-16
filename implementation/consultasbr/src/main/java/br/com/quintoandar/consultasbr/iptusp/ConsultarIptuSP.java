@@ -132,7 +132,7 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 					}
 				}
 			} else {
-				throw new IPTUSPException("ERRO ao consultar débitos. No. Contribuinte: " + numeroContribuinte);
+				throw new IPTUSPException("ERRO ao consultar débitos - SP. No. Contribuinte: " + numeroContribuinte);
 			}
 				
 		} finally {
@@ -234,7 +234,7 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 							
 						
 				} else {
-					throw new IPTUSPException("ERRO ao acessar 2a. via de boleto IPTU . No. Contribuinte: " + numeroContribuinte);
+					throw new IPTUSPException("ERRO ao acessar 2a. via de boleto IPTU SP. No. Contribuinte: " + numeroContribuinte);
 				}
 			}
 		
@@ -258,7 +258,7 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 				String mensagemPMSP = elements.get(0).text();				
 				if(mensagemPMSP != null && !mensagemPMSP.isEmpty()){
 						
-					StringBuilder msg = new StringBuilder("Erro ao Consultar boleto IPTU. ");
+					StringBuilder msg = new StringBuilder("Erro ao Consultar boleto IPTU SP. ");
 					msg.append(mensagemPMSP);
 							
 					throw new IPTUSPException(msg.toString(), htmlConsultaBoleto.getBytes(), "text/html");
