@@ -114,7 +114,7 @@ public class ConsultarIptuCampinasTest {
 			String htmlRetorno = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3421.41.47.0073.01006");
 			Assert.assertNotNull(htmlRetorno);
 			
-			FileOutputStream fos = new FileOutputStream("/home/eduardo/Documents/iptu-cps-devido.html");
+			FileOutputStream fos = new FileOutputStream(System.getProperty("user.home")+"/Documents/iptu-cps-devido.html");
 			fos.write(htmlRetorno.getBytes());
 			fos.close();
 			System.out.println("Iptu Campinas - quitado salvo.");
