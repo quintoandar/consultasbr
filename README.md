@@ -76,7 +76,7 @@ public class IGPMTeste {
 	}
 }
 ```
-### IPTU SP
+### IPTU São Paulo - SP
 
 ```java
 public class IGPMTeste {
@@ -96,3 +96,32 @@ public class IGPMTeste {
 }
 ```
  You can also check the tests to see how to use all the different types of consultas.
+ 
+ ### IPTU - Prefeitura Municipal de Campinas - SP
+
+```java
+public class CPFTeste {
+  public static void main(String[] args) {
+    ConsultarIptuCampinas consultar = new ConsultarIptuCampinas();
+    RespostaCaptcha captcha = consultar.requestCaptcha();
+    
+    //Shows a dialog with the captcha image to be solved
+    JLabel jLabel = new JLabel(new ImageIcon(captcha.getCaptchaImage()));
+		jLabel.setText("Solve captcha");
+		String captchaSolution = JOptionPane.showInputDialog(jLabel);
+		
+		String codigoCartografico = "0000.00.00.0000.00000"; // it accepts sequence without any format. ex.: 00000000000000000 (17 characters in sequence)
+		List<Resposta2ViaIPTU> parcelas res = consultar.buscar2aViaIPTU(captcha.getSessionId(), respCaptcha, codigoCartografico);
+    
+		if(res != null) {
+			for(Resposta2ViaIPTU p : parcelas){
+				 System.out.print("Bar Code: " + p.getCodigo());
+				 System.out.print("Código Cartográfico: " + p.getCodigoContribuinte());
+				 System.out.print("Year: " + p.getAnoExercicio());
+				 System.out.print("Payment series (Installment Payment): " + p.getNumParcela());
+				 System.out.print("Total (R$): " + p.getValor());
+				 System.out.print("Payment Due Date: " + p.getVencimento());
+			}
+	  }
+	}
+}
