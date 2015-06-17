@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>br.com.quintoandar</groupId>
+  <artifactId>consultasbr</artifactId>
+  <version>1.4.1-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20150617.214139</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <lastUpdated>20150617214139</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>jar</extension>
+        <value>1.4.1-20150617.214139-1</value>
+        <updated>20150617214139</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.4.1-20150617.214139-1</value>
+        <updated>20150617214139</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>sources</classifier>
+        <extension>jar</extension>
+        <value>1.4.1-20150617.214139-1</value>
+        <updated>20150617214139</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>javadoc</classifier>
+        <extension>jar</extension>
+        <value>1.4.1-20150617.214139-1</value>
+        <updated>20150617214139</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
