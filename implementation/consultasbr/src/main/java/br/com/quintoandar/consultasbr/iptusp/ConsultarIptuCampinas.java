@@ -86,8 +86,10 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 				"identificador", codigoCartografico,
 				"imagecode", respCaptcha
 				));
-		
-		httpIndex.addHeader(sessionId.replaceFirst("|.*$", ""), sessionId.replaceFirst("^.*|", ""));
+
+		// httpIndex.addHeader(sessionId.replaceFirst("|.*$", ""), sessionId.replaceFirst("^.*|", ""));
+		httpIndex.addHeader(COOKIEID, sessionId);
+		novoCookie(COOKIEID, sessionId);
 		
 		attachCookiesFromStore(httpIndex);
 		
