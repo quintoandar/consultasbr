@@ -40,12 +40,9 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 	private static String URL_CONSULTA_DEBITOS = "http://iptu.campinas.sp.gov.br/iptu/index.html";
 	private static String URL_BOLETO = "http://www3.prefeitura.sp.gov.br/iptudeb3/Forms/iptudeb3_pag01.aspx";
 	
-	// Nome do Cookie de Login do PHP.
 	private static String COOKIEID = "JSESSIONID";
-	
 	private static String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/34.0.1847.116 Chrome/34.0.1847.116 Safari/537.36";
 	
-	private Integer anoCorrente = Calendar.getInstance().get(Calendar.YEAR);
 
 	@Override
 	protected boolean shouldPersistCookie(BasicClientCookie ck) {
@@ -73,18 +70,6 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			connMan.closeIdleConnections(1, TimeUnit.MILLISECONDS);
 
 		}
-	}
-	
-	private String getElementValue(Document doc, String elementId){
-				
-		if(doc != null){
-			Elements elements = doc.select("#"+elementId);
-			if(elements != null && elements.size() > 0){
-				return elements.get(0).val();
-			}			
-		}
-		
-		return null;
 	}
 	
 	public String consultaBoletos(String sessionId, String respCaptcha, String codigoCartografico) throws ClientProtocolException, IOException, IPTUSPException {
@@ -359,54 +344,5 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-//		try {
-//			crawler.buscar2aViaIPTU("010.078.0045-3".replaceAll("\\D+",""), 5, 2014);
-//		}catch (Throwable t){
-//			System.out.println("Erro testes. " + t.getMessage() + t.getStackTrace());
-//		}
-//		
-//		try {
-//			//Teste - possui débito
-//			String quitado = "3414.32.29.0034.01056";
-//			htmlRetorno = crawler.consultaDebitos(quitado);
-//			hasDebitos = crawler.hasDebitos(htmlRetorno);
-//			System.out.println("Contribuinte Quitado. " + hasDebitos);
-//			
-//			String isento = "042.019.0079-7";
-//			isento = isento.replaceAll("\\D+","");
-//			htmlRetorno = crawler.consultaDebitos(isento);
-//			hasDebitos= crawler.hasDebitos(htmlRetorno);
-//			System.out.println("Contribuinte Isento. " + hasDebitos);
-//			
-//			String comDebito = "013.029.0819-7";
-//			comDebito = comDebito.replaceAll("\\D+","");
-//			htmlRetorno = crawler.consultaDebitos(comDebito);
-//			hasDebitos = crawler.hasDebitos(htmlRetorno);		
-//			System.out.println("Contribuinte com débitos. " + hasDebitos);
-//			
-//			if(hasDebitos){
-//				//Teste - busca próxima parcela
-//				List<Integer> proxsParcelas = crawler.getParcelasAberto(htmlRetorno);
-//				System.out.println("Próx. Parcela " + proxsParcelas);
-//				
-//				//Teste - busca 2a. via parcela
-//				htmlRetorno = crawler.consultaBoleto(comDebito,proxsParcelas.get(0), null);
-//				
-//				if(crawler.isValidBoleto(htmlRetorno)){
-//					Double valorBoleto = crawler.getValorBoleto(htmlRetorno);
-//					System.out.println("Valor Boleto = " + valorBoleto);
-//					
-//					Date vencimentoBoleto = crawler.getVencimentoBoleto(htmlRetorno);
-//					System.out.println("Vencimento Boleto = " + vencimentoBoleto);
-//					
-//					String codigoBoleto = crawler.getCodigoBoleto(htmlRetorno);
-//					System.out.println("Código Boleto = " + codigoBoleto);
-//				}
-//				
-//			}
-//		} catch (Throwable t){
-//			System.out.println("Erro testes. " + t.getMessage() + t.getStackTrace());
-//		}
 	}
 }
