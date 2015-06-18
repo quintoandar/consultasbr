@@ -271,7 +271,8 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			Integer numParcela = null;
 			for(Element el : parcela){
 				if(numParcela == null && el.text().trim().toLowerCase().contains("parcela")){
-					numParcela = Integer.parseInt(el.text().replaceAll("\\D+","").substring(0,1));
+					String campo = el.text().split("/")[0];
+					numParcela = Integer.parseInt(campo.replaceAll("\\D+",""));
 					break;
 				}
 			}
