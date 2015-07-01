@@ -30,7 +30,7 @@ Then add the dependency artifact:
   <dependency>
     <groupId>br.com.quintoandar</groupId>
     <artifactId>consultasbr</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.2-SNAPSHOT</version>
   </dependency>
   ...
 </dependencies>
