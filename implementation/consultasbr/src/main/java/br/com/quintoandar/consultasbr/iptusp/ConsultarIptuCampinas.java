@@ -338,13 +338,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			res.setDado(htmlBoletos.getBytes()); //salva carnê inteiro
 			res.setValor(valorBoleto);
 			
-			if(parcelasVencida != null){
-				for(Integer v : parcelasVencida){
-					if(v.equals(numParcela)){
-						res.setIsVencida(true);
-					}
-				}
-			}
+			res.setIsVencida((parcelasVencida != null && parcelasVencida.contains(numParcela)));
 		
 		} catch (ParseException e) {
 			throw new IPTUSPException(e);

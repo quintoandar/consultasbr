@@ -382,12 +382,7 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 						
 						if(r != null) {
 							
-							for(Integer v : parcelasVencida){
-								if(v.equals(p)){
-									r.setIsVencida(true);
-								}
-							}
-							
+							r.setIsVencida((parcelasVencida != null && parcelasVencida.contains(p)));
 							result.add(r);
 						}
 					}
@@ -421,12 +416,7 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			if(hasDebitos) {
 				
 				result = this.getResposta2Via(codContribuinte, parcela, anoExercicio);
-				
-				for(Integer v : parcelasVencida){
-					if(v.equals(parcela)){
-						result.setIsVencida(true);
-					}
-				}
+				result.setIsVencida((parcelasVencida != null && parcelasVencida.contains(parcela)));
 			}
 		} catch (Throwable e) {
 			
@@ -529,13 +519,10 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 				System.out.println("Parcelas Vencidas " + parcelasVencidas);
 				
 				for (Integer p : proxsParcelas) {
-						
-					for(Integer v : parcelasVencidas){
-						if(v.equals(p)){
-							System.out.println("Parcela: " + v + " vencida.");
-						}
+					
+					if(parcelasVencidas != null && parcelasVencidas.contains(p)){
+						System.out.println("Parcela: " + p + " vencida.");
 					}
-				
 				}
 				
 			}
