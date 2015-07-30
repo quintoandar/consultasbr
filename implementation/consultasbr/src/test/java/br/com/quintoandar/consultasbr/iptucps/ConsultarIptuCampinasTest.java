@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import br.com.quintoandar.consultasbr.iptusp.ConsultarIptuCampinas;
+import br.com.quintoandar.consultasbr.iptusp.ConsultarIptuCampinas.ConsultaBoletoResult;
 import br.com.quintoandar.consultasbr.iptusp.IPTUSPException;
 import br.com.quintoandar.consultasbr.iptusp.Resposta2ViaIPTU;
 import br.com.quintoandar.consultasbr.pf.ConsultaAntecedentes;
@@ -46,7 +47,7 @@ public class ConsultarIptuCampinasTest {
 	}
 
 	@Test
-	public void testConsultaIPTU() {
+	public void testAcessoConsultaIPTU() {
 		
 		RespostaCaptcha captcha = null;
 		try {
@@ -58,8 +59,8 @@ public class ConsultarIptuCampinasTest {
 		String respCaptcha = solveCaptcha("IPTU Campinas", captcha.getCaptchaImage());
 
 		try {
-			String htmlRetorno = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3414.32.29.0034.01056");
-			Assert.assertNull(htmlRetorno);
+			ConsultaBoletoResult consultaBoletos = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3414.32.29.0034.01056");
+			Assert.assertNotNull(consultaBoletos);
 			
 			System.out.println("Iptu Campinas - teste acesso.");
 			
@@ -86,7 +87,7 @@ public class ConsultarIptuCampinasTest {
 		String respCaptcha = solveCaptcha("IPTU Campinas", captcha.getCaptchaImage());
 
 		try {
-			String htmlRetorno = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3421.41.47.0073.010");
+			ConsultaBoletoResult consultaBoletos = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3421.41.47.0073.010");
 			System.out.println("Iptu Campinas - código cartográfico inválido.");
 		} catch (ClientProtocolException e) {
 			Assert.fail(e.getMessage());
@@ -111,11 +112,12 @@ public class ConsultarIptuCampinasTest {
 		String respCaptcha = solveCaptcha("IPTU Campinas", captcha.getCaptchaImage());
 
 		try {
-			String htmlRetorno = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3421.41.47.0073.01006");
-			Assert.assertNotNull(htmlRetorno);
+			ConsultaBoletoResult consultaBoletos = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, "3414.22.30.0025.02062");
+			String retornoHtml = consultaBoletos.getRetornoHtml();
+			Assert.assertNotNull(retornoHtml);
 			
 			FileOutputStream fos = new FileOutputStream(System.getProperty("user.home")+"/Documents/iptu-cps-devido.html");
-			fos.write(htmlRetorno.getBytes());
+			fos.write(retornoHtml.getBytes());
 			fos.close();
 			System.out.println("Iptu Campinas - quitado salvo.");
 			
@@ -142,8 +144,8 @@ public class ConsultarIptuCampinasTest {
 
 		try {
 			String codigoCartografico = "3441.34.11.0780.03066";
-			String htmlRetorno = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, codigoCartografico);
-			List<Resposta2ViaIPTU> parcelas = consultarIptuCampinas.getParcelasIptu(htmlRetorno, codigoCartografico);
+			ConsultaBoletoResult consultaBoletos = consultarIptuCampinas.consultaBoletos(captcha.getSessionId(), respCaptcha, codigoCartografico);
+			List<Resposta2ViaIPTU> parcelas = consultarIptuCampinas.getParcelasIptu(consultaBoletos, codigoCartografico);
 			Assert.assertNotNull(parcelas);
 			
 			for(Resposta2ViaIPTU p : parcelas){
@@ -177,7 +179,7 @@ public class ConsultarIptuCampinasTest {
 		String respCaptcha = solveCaptcha("IPTU Campinas", captcha.getCaptchaImage());
 
 		try {
-			String codigoCartografico = "3441.34.11.0780.03066";
+			String codigoCartografico = "3414.22.30.0025.02062";
 			List<Resposta2ViaIPTU> parcelas = consultarIptuCampinas.buscar2aViaIPTU(captcha.getSessionId(), respCaptcha, codigoCartografico);
 			Assert.assertNotNull(parcelas);
 			
@@ -188,6 +190,13 @@ public class ConsultarIptuCampinasTest {
 				Assert.assertNotNull(p.getNumParcela());
 				Assert.assertNotNull(p.getValor());
 				Assert.assertNotNull(p.getVencimento());
+				
+				System.out.println("Parcela " + p.getNumParcela() + " - " + p.getAnoExercicio());
+				System.out.println("código contribuinte: " + p.getCodigoContribuinte());
+				System.out.println("código: " + p.getCodigo());
+				System.out.println("valor: R$" + p.getValor());
+				System.out.println("vencimento: " + p.getVencimento());
+				System.out.println("vencida: "  + (p.getIsVencida()?"Sim":"Não"));
 			}
 			
 		} catch(Throwable t){
