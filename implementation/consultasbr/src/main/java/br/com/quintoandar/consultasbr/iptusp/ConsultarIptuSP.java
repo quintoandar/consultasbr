@@ -177,6 +177,32 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return parcelasAberto;
 	}
 	
+	private List<Integer> getParcelasVencida(String htmlConsultaDebitos){
+		
+		List<Integer> parcelasVencida = null;
+		
+		if(htmlConsultaDebitos != null){
+			parcelasVencida = new ArrayList<Integer>();
+			Document doc = Jsoup.parse(htmlConsultaDebitos);
+			Elements elements = doc.select("tr > td[align=left][width=75%] > font[size=2] > b");
+
+			if(elements != null && elements.size() > 0){
+				for(Element el : elements){
+					if(el.ownText().trim().contains("PRESTACOES VENCIDAS")){
+						String[] parcelas = el.text().replaceAll("\\D+"," ").split(" ");
+						for(String s : parcelas){
+							if(s != null && !s.isEmpty()){
+								parcelasVencida.add(Integer.parseInt(s));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return parcelasVencida;
+	}
+	
 	private String consultaBoleto(String numeroContribuinte, Integer parcelaIPTU, Integer anoExercicio) throws ClientProtocolException, IOException, IPTUSPException {
 		
 		String setor = numeroContribuinte.substring(0,3);
@@ -345,26 +371,24 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 				
 				//busca próximas parcelas
 				List<Integer> parcelasAberto = this.getParcelasAberto(htmlRetorno);
+				//procura por lista de parcelas vencidas
+				List<Integer> parcelasVencida = this.getParcelasVencida(htmlRetorno);
 				
 				if(parcelasAberto != null && parcelasAberto.size() > 0){
 					
 					for (Integer p : parcelasAberto) {
-				
-						htmlRetorno = this.consultaBoleto(codContribuinte, p, anoExercicio);
+						
+						Resposta2ViaIPTU r  = this.getResposta2Via(codContribuinte, p, anoExercicio);
+						
+						if(r != null) {
 							
-						if(this.isValidBoleto(htmlRetorno)) {
+							for(Integer v : parcelasVencida){
+								if(v.equals(p)){
+									r.setIsVencida(true);
+								}
+							}
 							
-							Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
-							Double valorBoleto = this.getValorBoleto(htmlRetorno);
-							String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
-										
-							Resposta2ViaIPTU res = new Resposta2ViaIPTU(codContribuinte,anoExercicio, p);
-							res.setVencimento(vencimentoBoleto);
-							res.setCodigo(codigoBoleto);
-							res.setDado(htmlRetorno.getBytes());
-							res.setValor(valorBoleto);
-							
-							result.add(res);
+							result.add(r);
 						}
 					}
 				} else{
@@ -385,28 +409,23 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 
 	public Resposta2ViaIPTU buscar2aViaIPTU(String codContribuinte, Integer parcela, Integer anoExercicio) throws IPTUSPException {
 		
+		Resposta2ViaIPTU result = null;
 		try {
 			
 			String htmlRetorno = this.consultaDebitos(codContribuinte);
 			Boolean hasDebitos = this.hasDebitos(htmlRetorno);	
+
+			//procura por lista de parcelas vencidas
+			List<Integer> parcelasVencida = this.getParcelasVencida(htmlRetorno);
 			
 			if(hasDebitos) {
 				
-				htmlRetorno = this.consultaBoleto(codContribuinte, parcela, anoExercicio);
+				result = this.getResposta2Via(codContribuinte, parcela, anoExercicio);
 				
-				if(this.isValidBoleto(htmlRetorno)) {
-					
-					Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
-					Double valorBoleto = this.getValorBoleto(htmlRetorno);
-					String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
-								
-					Resposta2ViaIPTU res = new Resposta2ViaIPTU(codContribuinte,anoExercicio,parcela);
-					res.setVencimento(vencimentoBoleto);
-					res.setCodigo(codigoBoleto);
-					res.setDado(htmlRetorno.getBytes());
-					res.setValor(valorBoleto);
-					
-					return res;
+				for(Integer v : parcelasVencida){
+					if(v.equals(parcela)){
+						result.setIsVencida(true);
+					}
 				}
 			}
 		} catch (Throwable e) {
@@ -415,6 +434,29 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		} finally {
 			connMan.closeIdleConnections(1, TimeUnit.MILLISECONDS);
 		}
+		return result;
+	}
+
+	private Resposta2ViaIPTU getResposta2Via(String codContribuinte, Integer parcela, Integer anoExercicio) 
+			throws ClientProtocolException, IOException, IPTUSPException, ParseException {
+		
+		String htmlRetorno = this.consultaBoleto(codContribuinte, parcela, anoExercicio);
+		
+		if(this.isValidBoleto(htmlRetorno)) {
+			
+			Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
+			Double valorBoleto = this.getValorBoleto(htmlRetorno);
+			String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
+						
+			Resposta2ViaIPTU res = new Resposta2ViaIPTU(codContribuinte,anoExercicio,parcela);
+			res.setVencimento(vencimentoBoleto);
+			res.setCodigo(codigoBoleto);
+			res.setDado(htmlRetorno.getBytes());
+			res.setValor(valorBoleto);
+			
+			return res;
+		}
+		
 		return null;
 	}
 	
@@ -470,6 +512,34 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 				}
 				
 			}
+			
+			
+			String comParcelasVencidas = "014.050.0418-5";
+			comParcelasVencidas = comParcelasVencidas.replaceAll("\\D+","");
+			htmlRetorno = crawler.consultaDebitos(comParcelasVencidas);
+			hasDebitos = crawler.hasDebitos(htmlRetorno);		
+			System.out.println("Contribuinte com débitos vencidos. " + hasDebitos);
+			
+			if(hasDebitos){
+				//Teste - busca próxima parcela
+				List<Integer> proxsParcelas = crawler.getParcelasAberto(htmlRetorno);
+				System.out.println("Parcelas em débito " + proxsParcelas);
+				
+				List<Integer> parcelasVencidas = crawler.getParcelasVencida(htmlRetorno);
+				System.out.println("Parcelas Vencidas " + parcelasVencidas);
+				
+				for (Integer p : proxsParcelas) {
+						
+					for(Integer v : parcelasVencidas){
+						if(v.equals(p)){
+							System.out.println("Parcela: " + v + " vencida.");
+						}
+					}
+				
+				}
+				
+			}
+			
 		} catch (Throwable t){
 			System.out.println("Erro testes. " + t.getMessage() + t.getStackTrace());
 		}

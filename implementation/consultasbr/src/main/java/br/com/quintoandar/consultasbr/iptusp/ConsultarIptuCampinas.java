@@ -49,6 +49,31 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		return true;
 	}
 	
+	public class ConsultaBoletoResult {
+		
+		private String retornoHtml = null;
+		private List<Integer> parcelasVencida = null;
+		
+		public ConsultaBoletoResult() {
+			super();
+		}
+		
+		public String getRetornoHtml() {
+			return retornoHtml;
+		}
+		public void setRetornoHtml(String retornoHtml) {
+			this.retornoHtml = retornoHtml;
+		}
+		public List<Integer> getParcelasVencida() {
+			return parcelasVencida;
+		}
+		public void setParcelasVencida(List<Integer> parcelasVencida) {
+			this.parcelasVencida = parcelasVencida;
+		}
+		
+		
+	}
+	
 	public RespostaCaptcha requestCaptcha() throws IPTUSPException {
 		HttpGet httpGet = new HttpGet("http://iptu.campinas.sp.gov.br/iptu/imagecodeRenderer");
 		httpGet.setHeader("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:29.0) Gecko/20100101 Firefox/29.0");
@@ -72,7 +97,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		}
 	}
 	
-	public String consultaBoletos(String sessionId, String respCaptcha, String codigoCartografico) throws ClientProtocolException, IOException, IPTUSPException {
+	public ConsultaBoletoResult consultaBoletos(String sessionId, String respCaptcha, String codigoCartografico) throws ClientProtocolException, IOException, IPTUSPException {
 		
 		HttpPost httpIndex = new HttpPost("http://iptu.campinas.sp.gov.br/iptu/index.html");
 		httpIndex.setHeader("User-Agent", USER_AGENT);
@@ -94,6 +119,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		attachCookiesFromStore(httpIndex);
 		
 		try {
+			ConsultaBoletoResult result = new ConsultaBoletoResult();
 			
 			HttpResponse respIndex = client.execute(httpIndex);
 			if (respIndex.getStatusLine().getStatusCode() == 302) { // caso sessão seja criada, server retorna 302; caso não consiga retorna 200 com mensagem na página
@@ -148,6 +174,21 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 						
 						Elements parcelasAtrasadas = doc.select("[name=idsParcelas][onclick]:not([disabled])");
 						if(parcelasAtrasadas != null && parcelasAtrasadas.size() > 0){
+							
+							Elements linhasParcelaAtrasada = doc.select("tr.destaque > td >label");
+							if(linhasParcelaAtrasada != null && linhasParcelaAtrasada.size() > 0){
+								
+								List<Integer> parcelasVencida = new ArrayList<Integer>();
+								for(Element el : linhasParcelaAtrasada){
+									String parcela = el.text().replaceAll("\\D+"," ");
+									if(parcela != null && !parcela.isEmpty()){
+										parcelasVencida.add(Integer.parseInt(parcela));
+									}
+								}
+								
+								result.setParcelasVencida(parcelasVencida);
+							}
+							
 							Calendar ultimoDiaMes = Calendar.getInstance();
 							ultimoDiaMes.set(Calendar.DAY_OF_MONTH, ultimoDiaMes.getActualMaximum(Calendar.DAY_OF_MONTH));
 							
@@ -198,7 +239,8 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 						}
 					}
 					
-					return htmlBoletos;
+					result.setRetornoHtml(htmlBoletos);
+					return result;
 				} else {
 					throw new IPTUSPException("ERRO ao acessar consulta IPTU - Prefeitura Campinas. Código Cartográfico: " + codigoCartografico);
 				}
@@ -238,19 +280,20 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		return null;
 	}
 	
-	public List<Resposta2ViaIPTU> getParcelasIptu(String htmlBoletos, String codigoCartografico) throws IPTUSPException {
+	public List<Resposta2ViaIPTU> getParcelasIptu(ConsultaBoletoResult consultaBoletos, String codigoCartografico) throws IPTUSPException {
 		
 		
 		List<Resposta2ViaIPTU> parcelas = new ArrayList<Resposta2ViaIPTU>();
 		
-		if(htmlBoletos != null){
+		String retornoHtml = consultaBoletos.getRetornoHtml();
+		if(retornoHtml != null){
 			
-			Document doc = Jsoup.parse(htmlBoletos);
+			Document doc = Jsoup.parse(retornoHtml);
 			Elements boletos = doc.select("table.principal");
 			
 			for(Element boleto : boletos){
 				
-				Resposta2ViaIPTU p = getParcelaIptu(htmlBoletos, codigoCartografico, boleto);
+				Resposta2ViaIPTU p = getParcelaIptu(retornoHtml, codigoCartografico, boleto, consultaBoletos.getParcelasVencida());
 				if(p!=null) {
 					parcelas.add(p);
 				}
@@ -261,7 +304,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		
 	}
 
-	private Resposta2ViaIPTU getParcelaIptu(String htmlBoletos, String codigoCartografico, Element boleto) throws IPTUSPException {
+	private Resposta2ViaIPTU getParcelaIptu(String htmlBoletos, String codigoCartografico, Element boleto, List<Integer> parcelasVencida) throws IPTUSPException {
 		
 		Resposta2ViaIPTU res = null;
 		
@@ -292,8 +335,16 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			res = new Resposta2ViaIPTU(codigoCartografico,vencimentoBoleto.getYear(),numParcela);
 			res.setVencimento(vencimentoBoleto);
 			res.setCodigo(codigoBoleto.toString());
-			res.setDado(htmlBoletos.getBytes());
+			res.setDado(htmlBoletos.getBytes()); //salva carnê inteiro
 			res.setValor(valorBoleto);
+			
+			if(parcelasVencida != null){
+				for(Integer v : parcelasVencida){
+					if(v.equals(numParcela)){
+						res.setIsVencida(true);
+					}
+				}
+			}
 		
 		} catch (ParseException e) {
 			throw new IPTUSPException(e);
@@ -308,11 +359,11 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		
 		try {
 			
-			String htmlBoletos = this.consultaBoletos(sessionId, respCaptcha, codigoCartografico);
+			ConsultaBoletoResult consultaBoletos = this.consultaBoletos(sessionId, respCaptcha, codigoCartografico);
 				
-			if(htmlBoletos != null){
+			if(consultaBoletos != null && consultaBoletos.getRetornoHtml() != null){
 				
-				result = getParcelasIptu(htmlBoletos, codigoCartografico);
+				result = getParcelasIptu(consultaBoletos, codigoCartografico);
 			}
 			
 		} catch (Throwable e) {

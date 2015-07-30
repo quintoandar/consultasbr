@@ -19,12 +19,15 @@ public class Resposta2ViaIPTU implements Serializable {
 	private byte[] dado;
 	
 	private Double valor;
+	
+	private Boolean isVencida;
 
 	public Resposta2ViaIPTU(String codigoContribuinte, Integer anoExercicio, Integer numParcela) {
 		super();
 		this.codigoContribuinte = codigoContribuinte;
 		this.anoExercicio = anoExercicio;
 		this.numParcela = numParcela;
+		this.isVencida = false;
 	}
 
 	public String getCodigoContribuinte() {
@@ -81,6 +84,14 @@ public class Resposta2ViaIPTU implements Serializable {
 
 	public void setValor(Double valor) {
 		this.valor = valor;
+	}
+
+	public Boolean getIsVencida() {
+		return isVencida;
+	}
+
+	public void setIsVencida(Boolean isVencida) {
+		this.isVencida = isVencida;
 	}
 	
 	
