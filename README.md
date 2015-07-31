@@ -80,12 +80,12 @@ public class IGPMTeste {
 ### IPTU São Paulo - SP
 
 ```java
-public class IGPMTeste {
+public class IPTUSPTeste {
   public static void main(String[] args) {
     ConsultarIptuSP crawler = new ConsultarIptuSP();
     String taxpayerCode = ""; //SP city code, like "000.000.0000-0"
     int parcelNumber = 5;
-    int year = 2014;
+    int year = 2015;
     try {
       Resposta2ViaIPTU resp = crawler.buscar2aViaIPTU(taxpayerCode, parcelNumber, year);
       System.out.println(String.format("Boleto: %s",resp.getCodigo()));
@@ -101,7 +101,7 @@ public class IGPMTeste {
 ### IPTU - Prefeitura Municipal de Campinas - SP
 
 ```java
-public class CPFTeste {
+public class IPTUCpsTeste {
   public static void main(String[] args) {
     ConsultarIptuCampinas consultar = new ConsultarIptuCampinas();
     RespostaCaptcha captcha = consultar.requestCaptcha();
@@ -122,6 +122,8 @@ public class CPFTeste {
 				 System.out.print("Payment series (Installment Payment): " + p.getNumParcela());
 				 System.out.print("Total (R$): " + p.getValor());
 				 System.out.print("Payment Due Date: " + p.getVencimento());
+				 System.out.print("Overdue Payment: " + p.getIsVencida());
+				 System.out.print("Original Payment Due Date: " + p.getMesReferencia());
 			}
 	  }
 	}
