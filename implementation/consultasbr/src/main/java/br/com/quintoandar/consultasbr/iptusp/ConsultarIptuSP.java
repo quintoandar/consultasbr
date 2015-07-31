@@ -342,9 +342,11 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			Document doc = Jsoup.parse(htmlConsultaBoleto.replaceAll("&nbsp;", " "));
 			Elements b = doc.select("td[colspan=3]:not([style=border: 0.04cm black solid;]) > table > tbody > tr > td[align=CENTER] > font > b");
 			
-			String dataVectoOriginalText = b.get(0).text();
-			log.info("Text: "+dataVectoOriginal);
-			dataVectoOriginal  = sdfRecebido.parse(dataVectoOriginalText.replaceAll("[^0-9/]", ""));
+			if(b != null && b.size() > 0){
+				String dataVectoOriginalText = b.get(0).text();
+				log.info("Text: "+dataVectoOriginal);
+				dataVectoOriginal  = sdfRecebido.parse(dataVectoOriginalText.replaceAll("[^0-9/]", ""));
+			}
 		
 		}
 		return dataVectoOriginal;
