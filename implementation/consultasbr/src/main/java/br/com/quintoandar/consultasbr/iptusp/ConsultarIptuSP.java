@@ -333,6 +333,23 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return dataValidade;
 	}
 	
+	private Date getVencimentoOriginalBoleto(String htmlConsultaBoleto) throws ParseException{
+		
+		Date dataVectoOriginal = null;
+		
+		if(htmlConsultaBoleto != null){
+			
+			Document doc = Jsoup.parse(htmlConsultaBoleto.replaceAll("&nbsp;", " "));
+			Elements b = doc.select("td[colspan=3]:not([style=border: 0.04cm black solid;]) > table > tbody > tr > td[align=CENTER] > font > b");
+			
+			String dataVectoOriginalText = b.get(0).text();
+			log.info("Text: "+dataVectoOriginal);
+			dataVectoOriginal  = sdfRecebido.parse(dataVectoOriginalText.replaceAll("[^0-9/]", ""));
+		
+		}
+		return dataVectoOriginal;
+	}
+	
 	private String getCodigoBoleto(String htmlConsultaBoleto){
 		
 		String codigo = null;
@@ -437,13 +454,14 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
 			Double valorBoleto = this.getValorBoleto(htmlRetorno);
 			String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
-						
+			Date vencimentoOriginal = this.getVencimentoOriginalBoleto(htmlRetorno);
+			
 			Resposta2ViaIPTU res = new Resposta2ViaIPTU(codContribuinte,anoExercicio,parcela);
 			res.setVencimento(vencimentoBoleto);
 			res.setCodigo(codigoBoleto);
 			res.setDado(htmlRetorno.getBytes());
 			res.setValor(valorBoleto);
-			
+			res.setMesReferencia(vencimentoOriginal);
 			return res;
 		}
 		
@@ -464,19 +482,19 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		
 		try {
 			//Teste - possui débito
-			String quitado = "041.164.0382-2";
-			quitado = quitado.replaceAll("\\D+","");
-			htmlRetorno = crawler.consultaDebitos(quitado);
-			hasDebitos = crawler.hasDebitos(htmlRetorno);
-			System.out.println("Contribuinte Quitado. " + hasDebitos);
+//			String quitado = "041.164.0382-2";
+//			quitado = quitado.replaceAll("\\D+","");
+//			htmlRetorno = crawler.consultaDebitos(quitado);
+//			hasDebitos = crawler.hasDebitos(htmlRetorno);
+//			System.out.println("Contribuinte Quitado. " + hasDebitos);
+//			
+//			String isento = "042.019.0079-7";
+//			isento = isento.replaceAll("\\D+","");
+//			htmlRetorno = crawler.consultaDebitos(isento);
+//			hasDebitos= crawler.hasDebitos(htmlRetorno);
+//			System.out.println("Contribuinte Isento. " + hasDebitos);
 			
-			String isento = "042.019.0079-7";
-			isento = isento.replaceAll("\\D+","");
-			htmlRetorno = crawler.consultaDebitos(isento);
-			hasDebitos= crawler.hasDebitos(htmlRetorno);
-			System.out.println("Contribuinte Isento. " + hasDebitos);
-			
-			String comDebito = "013.029.0819-7";
+			String comDebito = "014.050.0418-5";
 			comDebito = comDebito.replaceAll("\\D+","");
 			htmlRetorno = crawler.consultaDebitos(comDebito);
 			hasDebitos = crawler.hasDebitos(htmlRetorno);		
@@ -499,6 +517,9 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 					
 					String codigoBoleto = crawler.getCodigoBoleto(htmlRetorno);
 					System.out.println("Código Boleto = " + codigoBoleto);
+					
+					Date vencimentoOriginalBoleto = crawler.getVencimentoOriginalBoleto(htmlRetorno);
+					System.out.println("Vencimento Original " + vencimentoOriginalBoleto);
 				}
 				
 			}

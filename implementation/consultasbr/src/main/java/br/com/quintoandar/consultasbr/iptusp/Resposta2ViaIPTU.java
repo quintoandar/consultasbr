@@ -21,6 +21,8 @@ public class Resposta2ViaIPTU implements Serializable {
 	private Double valor;
 	
 	private Boolean isVencida;
+	
+	private Date mesReferencia;
 
 	public Resposta2ViaIPTU(String codigoContribuinte, Integer anoExercicio, Integer numParcela) {
 		super();
@@ -93,6 +95,13 @@ public class Resposta2ViaIPTU implements Serializable {
 	public void setIsVencida(Boolean isVencida) {
 		this.isVencida = isVencida;
 	}
-	
+
+	public Date getMesReferencia() {
+		return mesReferencia;
+	}
+
+	public void setMesReferencia(Date mesReferencia) {
+		this.mesReferencia = mesReferencia;
+	}
 	
 }
