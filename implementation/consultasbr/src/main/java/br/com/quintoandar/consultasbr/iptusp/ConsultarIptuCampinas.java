@@ -10,9 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -52,7 +53,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 	public class ConsultaBoletoResult {
 		
 		private String retornoHtml = null;
-		private List<Integer> parcelasVencida = null;
+		private Map<Integer,Date> parcelasVencida = null;
 		
 		public ConsultaBoletoResult() {
 			super();
@@ -61,16 +62,18 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		public String getRetornoHtml() {
 			return retornoHtml;
 		}
+		
 		public void setRetornoHtml(String retornoHtml) {
 			this.retornoHtml = retornoHtml;
 		}
-		public List<Integer> getParcelasVencida() {
+
+		public Map<Integer, Date> getParcelasVencida() {
 			return parcelasVencida;
 		}
-		public void setParcelasVencida(List<Integer> parcelasVencida) {
+
+		public void setParcelasVencida(Map<Integer, Date> parcelasVencida) {
 			this.parcelasVencida = parcelasVencida;
 		}
-		
 		
 	}
 	
@@ -175,14 +178,25 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 						Elements parcelasAtrasadas = doc.select("[name=idsParcelas][onclick]:not([disabled])");
 						if(parcelasAtrasadas != null && parcelasAtrasadas.size() > 0){
 							
-							Elements linhasParcelaAtrasada = doc.select("tr.destaque > td >label");
+							Elements linhasParcelaAtrasada = doc.select("tr.destaque");
 							if(linhasParcelaAtrasada != null && linhasParcelaAtrasada.size() > 0){
 								
-								List<Integer> parcelasVencida = new ArrayList<Integer>();
+								Map<Integer,Date> parcelasVencida = new HashMap<Integer, Date>();
 								for(Element el : linhasParcelaAtrasada){
-									String parcela = el.text().replaceAll("\\D+"," ");
+									
+									Elements numParcela = el.select("td > label");
+									if(numParcela != null && numParcela.size() > 0){
+									String parcela = numParcela.get(0).text().replaceAll("\\D+"," ");
+									
 									if(parcela != null && !parcela.isEmpty()){
-										parcelasVencida.add(Integer.parseInt(parcela));
+										try {
+												Element vctoOriginal = el.select("td[valign=middle]").get(0);
+												Date dataVctoOriginal = simpleDateFormat.parse(vctoOriginal.text());
+												parcelasVencida.put(Integer.parseInt(parcela), dataVctoOriginal);
+											} catch (Throwable t) {
+												throw new IPTUSPException("ERRO ao consultar IPTU - Prefeitura Campinas. Leitura de data de vencimento original de parcela. Código Cartográfico: " + codigoCartografico);
+											}
+										}
 									}
 								}
 								
@@ -213,6 +227,10 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 						
 							
 						HttpResponse respCobranca = client.execute(httpCobranca);
+						ByteArrayOutputStream baosTeste = new ByteArrayOutputStream();
+						respCobranca.getEntity().writeTo(baosTeste);
+						htmlBoletos = new String(baosTeste.toByteArray(), "ISO-8859-1");
+						
 						if (respCobranca.getStatusLine().getStatusCode() == 302) {
 							
 							HttpGet httpBoletos = new HttpGet("http://iptu.campinas.sp.gov.br/iptu/carne.html");
@@ -270,7 +288,6 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 				}
 				
 			}
-		
 		} finally {
 			httpIndex.abort();
 			connMan.closeIdleConnections(1, TimeUnit.MILLISECONDS);
@@ -304,7 +321,7 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 		
 	}
 
-	private Resposta2ViaIPTU getParcelaIptu(String htmlBoletos, String codigoCartografico, Element boleto, List<Integer> parcelasVencida) throws IPTUSPException {
+	private Resposta2ViaIPTU getParcelaIptu(String htmlBoletos, String codigoCartografico, Element boleto, Map<Integer, Date> parcelasVencida) throws IPTUSPException {
 		
 		Resposta2ViaIPTU res = null;
 		
@@ -337,8 +354,14 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			res.setCodigo(codigoBoleto.toString());
 			res.setDado(htmlBoletos.getBytes()); //salva carnê inteiro
 			res.setValor(valorBoleto);
+			boolean isVencida = parcelasVencida != null && parcelasVencida.containsKey(numParcela);
+			res.setIsVencida(isVencida);
 			
-			res.setIsVencida((parcelasVencida != null && parcelasVencida.contains(numParcela)));
+			if(isVencida) {
+				res.setMesReferencia(parcelasVencida.get(numParcela));
+			} else {
+				res.setMesReferencia(vencimentoBoleto);
+			}
 		
 		} catch (ParseException e) {
 			throw new IPTUSPException(e);

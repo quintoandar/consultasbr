@@ -197,10 +197,12 @@ public class ConsultarIptuCampinasTest {
 				System.out.println("valor: R$" + p.getValor());
 				System.out.println("vencimento: " + p.getVencimento());
 				System.out.println("vencida: "  + (p.getIsVencida()?"Sim":"Não"));
+				System.out.println("vencimento original: "  + p.getMesReferencia());
 			}
 			
 		} catch(Throwable t){
 			Assert.fail("Exceção " + t.getMessage());
+			System.out.println(t.getStackTrace());
 		}
 	}
 
