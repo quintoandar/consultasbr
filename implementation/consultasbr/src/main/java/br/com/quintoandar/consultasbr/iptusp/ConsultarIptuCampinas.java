@@ -348,8 +348,11 @@ public class ConsultarIptuCampinas extends SimpleHttpQuerier {
 			for(Element el : codBarras){
 				codigoBoleto.append(el.text().replaceAll("\\D+",""));
 			}
-						
-			res = new Resposta2ViaIPTU(codigoCartografico,vencimentoBoleto.getYear(),numParcela);
+			
+			Calendar anoExercicio = Calendar.getInstance();
+			anoExercicio.setTime(vencimentoBoleto);
+			
+			res = new Resposta2ViaIPTU(codigoCartografico,anoExercicio.get(Calendar.YEAR),numParcela);
 			res.setVencimento(vencimentoBoleto);
 			res.setCodigo(codigoBoleto.toString());
 			res.setDado(htmlBoletos.getBytes()); //salva carnê inteiro
