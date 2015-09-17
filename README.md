@@ -3,7 +3,10 @@ consultasbr
 
 A series of libs that allow different queries about information in Brazil: CPF (~Security Social ID), Antecedentes Criminais PF (~criminal record with federal police), Processos no TJSP (~public records of court processes/cases of São Paulo State).
 
-* New: CreciSP (Real estate agent registry)
+* New: CreciSP (Real estate agent registry status)
+
+=====
+---
 
 * IGPMReader (IGP-M index). 
 * Receita Federal (CPF, brazilian social security id)
