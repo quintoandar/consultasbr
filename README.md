@@ -1,10 +1,19 @@
 consultasbr
 ===========
 
-A series of libs that allow different queries about a person in Brazil: CPF (~Security Social ID), Antecedentes Criminais PF (~criminal record with federal police), Processos no TJSP (~public records of court processes/cases of São Paulo State).
+A series of libs that allow different queries about information in Brazil: CPF (~Security Social ID), Antecedentes Criminais PF (~criminal record with federal police), Processos no TJSP (~public records of court processes/cases of São Paulo State).
 
-* New: IGPMReader to read IGP-M index. 
-* New: IPTU Campinas
+* New: CreciSP (Real estate agent registry status)
+
+=====
+---
+
+* IGPMReader (IGP-M index). 
+* Receita Federal (CPF, brazilian social security id)
+* Policia Federal (Criminal records on Federal Police)
+* TJSP (records of Legal Process on SP estate)
+* IPTU SP (payment order of IPTU for SP city)
+* IPTU Campinas
 
 Mvn Usage
 -----
@@ -128,3 +137,21 @@ public class IPTUCpsTeste {
 	  }
 	}
 }
+```
+### Creci SP
+
+```java
+public class CreciSPTeste {
+ public static void main(String[] args) {
+   ConsultarCreci consultar = new ConsultarCreci();
+   ResultadoCreci resCreci = consultar.consultar("137.304", TipoCreci.Fisica);
+   
+   if(resCreci != null) {
+      System.out.print("Creci: " + resCreci.getCreci());
+      System.out.print("Status: " + resCreci.getStatus()); //Ativo or Inativo
+   } else {
+     System.out.print("Error :(");
+   }
+ }
+}
+```
