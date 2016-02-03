@@ -295,22 +295,6 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return true;
 	}
 	
-	private Double getValorBoleto(String htmlConsultaBoleto){
-		
-		Double valorBoleto = 0D;
-		
-		if(htmlConsultaBoleto != null){
-			Document doc = Jsoup.parse(htmlConsultaBoleto);
-			Elements elements = doc.select("tr > td[align=RIGHT] > font > b");
-
-			if(elements != null && elements.size() > 0){
-				valorBoleto = Double.parseDouble(elements.get(0).text().replace(".", "").replace(",", ".").replace(" ","").trim());
-			}
-		}
-		
-		return valorBoleto;
-	}
-	
 	private Date getVencimentoBoleto(String htmlConsultaBoleto) throws ParseException{
 		
 		Date dataValidade = null;
@@ -376,6 +360,57 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		}
 		return codigo;
 	}
+	
+	private Double getValorBase(String htmlConsultaBoleto){
+		final Integer posicaoCelula = 2;
+		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+	}
+	
+	private Double getMulta(String htmlConsultaBoleto){
+		final Integer posicaoCelula = 3;
+		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+	}
+	
+	private Double getCorrecaoMonetaria(String htmlConsultaBoleto){
+		final Integer posicaoCelula = 4;
+		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+	}
+	
+	private Double getJuros(String htmlConsultaBoleto){
+		final Integer posicaoCelula = 5;
+		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+	}
+	
+	private Double getValorBoleto(String htmlConsultaBoleto){
+		final Integer posicaoCelula = 7;
+		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+	}
+
+	/*
+	 * Método auxiliar que extraí um valor da coluna de valores dado o HTML e a posição da célula,
+	 * em que:
+	 * 2 - Valor Base (ou principal) 
+	 * 3 - Multa 
+	 * 4 - Correcao Monetaria
+	 * 5 - Juros
+	 * 7 - Valor total
+	 */
+	private Double extrairValorColuna(String htmlConsultaBoleto, Integer posicaoCelula) throws NumberFormatException{
+		Double valorCampo = 0D;
+		
+		if(htmlConsultaBoleto != null){
+			Document doc = Jsoup.parse(htmlConsultaBoleto);
+			Elements elements = doc.select(String.format("tbody tr:nth-child(%d) td[align=RIGHT]  b", posicaoCelula));
+
+			if(elements != null && elements.size() > 0){
+				String campoStr = elements.get(0).text().replace(".", "").replace(",", ".").replace(" ","").trim();
+				if(!campoStr.isEmpty())	valorCampo = Double.parseDouble(campoStr);
+			}
+		}
+		
+		return valorCampo;
+	}
+	
 	
 	public List<Resposta2ViaIPTU> buscar2aViaIPTU(String codContribuinte, Integer anoExercicio) throws IPTUSPException {
 		
@@ -455,6 +490,10 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			
 			Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
 			Double valorBoleto = this.getValorBoleto(htmlRetorno);
+			Double valorBase = this.getValorBase(htmlRetorno); 
+			Double multa = this.getMulta(htmlRetorno);
+			Double correcaoMonetaria = this.getCorrecaoMonetaria(htmlRetorno);
+			Double juros = this.getJuros(htmlRetorno);
 			String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
 			Date vencimentoOriginal = this.getVencimentoOriginalBoleto(htmlRetorno);
 			
@@ -463,6 +502,10 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			res.setCodigo(codigoBoleto);
 			res.setDado(htmlRetorno.getBytes());
 			res.setValor(valorBoleto);
+			res.setValorBase(valorBase);
+			res.setMulta(multa);
+			res.setCorrecaoMonetaria(correcaoMonetaria);
+			res.setJuros(juros);
 			res.setMesReferencia(vencimentoOriginal);
 			return res;
 		}
@@ -470,88 +513,4 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return null;
 	}
 	
-	public static void main(String[] args) {
-		
-		ConsultarIptuSP crawler = new ConsultarIptuSP();
-		String htmlRetorno;
-		Boolean hasDebitos;
-		
-		try {
-			crawler.buscar2aViaIPTU("010.078.0045-3".replaceAll("\\D+",""), 5, 2014);
-		}catch (Throwable t){
-			System.out.println("Erro testes. " + t.getMessage() + t.getStackTrace());
-		}
-		
-		try {
-			//Teste - possui débito
-//			String quitado = "041.164.0382-2";
-//			quitado = quitado.replaceAll("\\D+","");
-//			htmlRetorno = crawler.consultaDebitos(quitado);
-//			hasDebitos = crawler.hasDebitos(htmlRetorno);
-//			System.out.println("Contribuinte Quitado. " + hasDebitos);
-//			
-//			String isento = "042.019.0079-7";
-//			isento = isento.replaceAll("\\D+","");
-//			htmlRetorno = crawler.consultaDebitos(isento);
-//			hasDebitos= crawler.hasDebitos(htmlRetorno);
-//			System.out.println("Contribuinte Isento. " + hasDebitos);
-			
-			String comDebito = "014.050.0418-5";
-			comDebito = comDebito.replaceAll("\\D+","");
-			htmlRetorno = crawler.consultaDebitos(comDebito);
-			hasDebitos = crawler.hasDebitos(htmlRetorno);		
-			System.out.println("Contribuinte com débitos. " + hasDebitos);
-			
-			if(hasDebitos){
-				//Teste - busca próxima parcela
-				List<Integer> proxsParcelas = crawler.getParcelasAberto(htmlRetorno);
-				System.out.println("Próx. Parcela " + proxsParcelas);
-				
-				//Teste - busca 2a. via parcela
-				htmlRetorno = crawler.consultaBoleto(comDebito,proxsParcelas.get(0), null);
-				
-				if(crawler.isValidBoleto(htmlRetorno)){
-					Double valorBoleto = crawler.getValorBoleto(htmlRetorno);
-					System.out.println("Valor Boleto = " + valorBoleto);
-					
-					Date vencimentoBoleto = crawler.getVencimentoBoleto(htmlRetorno);
-					System.out.println("Vencimento Boleto = " + vencimentoBoleto);
-					
-					String codigoBoleto = crawler.getCodigoBoleto(htmlRetorno);
-					System.out.println("Código Boleto = " + codigoBoleto);
-					
-					Date vencimentoOriginalBoleto = crawler.getVencimentoOriginalBoleto(htmlRetorno);
-					System.out.println("Vencimento Original " + vencimentoOriginalBoleto);
-				}
-				
-			}
-			
-			
-			String comParcelasVencidas = "014.050.0418-5";
-			comParcelasVencidas = comParcelasVencidas.replaceAll("\\D+","");
-			htmlRetorno = crawler.consultaDebitos(comParcelasVencidas);
-			hasDebitos = crawler.hasDebitos(htmlRetorno);		
-			System.out.println("Contribuinte com débitos vencidos. " + hasDebitos);
-			
-			if(hasDebitos){
-				//Teste - busca próxima parcela
-				List<Integer> proxsParcelas = crawler.getParcelasAberto(htmlRetorno);
-				System.out.println("Parcelas em débito " + proxsParcelas);
-				
-				List<Integer> parcelasVencidas = crawler.getParcelasVencida(htmlRetorno);
-				System.out.println("Parcelas Vencidas " + parcelasVencidas);
-				
-				for (Integer p : proxsParcelas) {
-					
-					if(parcelasVencidas != null && parcelasVencidas.contains(p)){
-						System.out.println("Parcela: " + p + " vencida.");
-					}
-				}
-				
-			}
-			
-		} catch (Throwable t){
-			System.out.println("Erro testes. " + t.getMessage() + t.getStackTrace());
-		}
-	}
 }

@@ -23,6 +23,14 @@ public class Resposta2ViaIPTU implements Serializable {
 	private Boolean isVencida;
 	
 	private Date mesReferencia;
+	
+	private Double multa = 0.0D;
+	
+	private Double correcaoMonetaria = 0.0D;
+	
+	private Double juros = 0.0D;
+	
+	private Double valorBase;
 
 	public Resposta2ViaIPTU(String codigoContribuinte, Integer anoExercicio, Integer numParcela) {
 		super();
@@ -102,6 +110,38 @@ public class Resposta2ViaIPTU implements Serializable {
 
 	public void setMesReferencia(Date mesReferencia) {
 		this.mesReferencia = mesReferencia;
+	}
+
+	public Double getMulta() {
+		return multa;
+	}
+
+	public void setMulta(Double multa) {
+		this.multa = multa;
+	}
+
+	public Double getCorrecaoMonetaria() {
+		return correcaoMonetaria;
+	}
+
+	public void setCorrecaoMonetaria(Double correcaoMonetaria) {
+		this.correcaoMonetaria = correcaoMonetaria;
+	}
+
+	public Double getJuros() {
+		return juros;
+	}
+
+	public void setJuros(Double juros) {
+		this.juros = juros;
+	}
+
+	public Double getValorBase() {
+		return valorBase;
+	}
+
+	public void setValorBase(Double valorBase) {
+		this.valorBase = valorBase;
 	}
 	
 }
