@@ -3,12 +3,16 @@ package br.com.quintoandar.consultasbr.iptusp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,6 +49,8 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 	private static String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/34.0.1847.116 Chrome/34.0.1847.116 Safari/537.36";
 	
 	private Integer anoCorrente = Calendar.getInstance().get(Calendar.YEAR);
+	
+	private static final NumberFormat numberFormatPTBR = NumberFormat.getInstance(Locale.forLanguageTag("pt-BR"));
 
 	@Override
 	protected boolean shouldPersistCookie(BasicClientCookie ck) {
@@ -411,6 +417,63 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return valorCampo;
 	}
 	
+	private String extrairValorLinha(Element tr, Integer posicaoCelula) throws NumberFormatException{
+			
+		if(tr != null){
+			Elements elements = tr.select(String.format("td:nth-child(%d) font b", posicaoCelula));
+
+			if(elements != null && elements.size() > 0){
+				return elements.get(0).text().trim();				
+			}
+		}
+		
+		return null;
+	}
+	
+	private Integer extrairValorInteger(Element tr, Integer posicaoCelula) throws NumberFormatException{		
+		String strValue = extrairValorLinha(tr, posicaoCelula);
+		if(strValue != null){
+			try{
+				return Integer.valueOf(strValue);
+			}catch(Throwable t){
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	private Double extrairValorDouble(Element tr, Integer posicaoCelula) throws NumberFormatException{		
+		String strValue = extrairValorLinha(tr, posicaoCelula);
+		if(strValue != null){
+			try{
+				return numberFormatPTBR.parse(strValue).doubleValue();
+			}catch(Throwable t){
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	private Set<Integer> extrairListaInteiros(String strValue){
+		Set<Integer> values = null;
+		try{
+			if(strValue != null){			
+				String[] strArray = strValue.replaceAll("\\D+"," ").split(" ");
+				if(strArray != null && strArray.length > 0){
+					values = new HashSet<Integer>();
+					for(String s : strArray){
+						if(s != null && !s.isEmpty()){
+							values.add(Integer.parseInt(s));
+						}
+					}
+				}		
+			}	
+		}catch(Throwable t){
+			return null;
+		}
+		return values;
+	}
+		
 	
 	public List<Resposta2ViaIPTU> buscar2aViaIPTU(String codContribuinte, Integer anoExercicio) throws IPTUSPException {
 		
@@ -513,4 +576,101 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return null;
 	}
 	
+	
+	public RespostaConsultaDebito consultarDebitos(String codContribuinte) throws IPTUSPException {
+		RespostaConsultaDebito resp = null;		
+		try {
+			String htmlRetorno = this.consultaDebitos(codContribuinte);
+			resp = gerarRespostaConsultaDebito(codContribuinte, htmlRetorno, anoCorrente);			
+		} catch (Throwable t) {
+			throw new IPTUSPException(t);
+		} finally {
+			connMan.closeIdleConnections(1, TimeUnit.MILLISECONDS);
+		}
+
+		return resp;
+	}
+	
+	//VisibleForTesting
+	protected RespostaConsultaDebito gerarRespostaConsultaDebito(String codigoContribuinte, String htmlStr, Integer anoCorrente){
+		RespostaConsultaDebito resposta = null;
+		if(htmlStr != null){
+			resposta = new RespostaConsultaDebito(codigoContribuinte, anoCorrente);
+			resposta.sedtPossuiDebitos(Boolean.FALSE);
+			
+			htmlStr = htmlStr.replaceAll("[\n\r]", "");			
+			Document doc = Jsoup.parse(htmlStr.replaceAll("&nbsp;", " "));
+			
+			if(this.hasDebitos(htmlStr)){								
+				resposta.sedtPossuiDebitos(Boolean.TRUE);				
+				resposta.setDebitoExercicioAtual(extrairDebitoExercicioAtual(doc));																
+			}
+			
+			if(!htmlStr.contains("Não existem débitos anteriores")){
+				resposta.addAllInformacaoDebito(extrairDebitosAnteriores(doc));
+			}			
+		}		
+		return resposta;
+	}
+	
+	private InformacaoDebito extrairDebitoExercicioAtual(Document doc) {
+		InformacaoDebito debitoAtual = null;
+				
+		Elements elements = doc.select("table  table > tbody > tr");
+		if(elements != null && elements.size() >= 5){
+			debitoAtual = new InformacaoDebito();
+			debitoAtual.setAnoExercicio(anoCorrente);
+			
+			Element linhaTotalDebito = elements.get(0);
+			Element linhaParcelasVencidas = elements.get(2);
+			Element linhaParcelasAbertas = elements.get(4);
+						
+			debitoAtual.setTotalDebito(extrairValorDouble(linhaTotalDebito, 3));
+			
+			String linhaVencidasStr = extrairValorLinha(linhaParcelasVencidas, 1);
+			Set<Integer> parcelasVencidas = extrairListaInteiros(linhaVencidasStr);
+			parcelasVencidas = parcelasVencidas != null ? parcelasVencidas : new HashSet<Integer>();
+			debitoAtual.setParcelasVencidas(parcelasVencidas);
+			
+			String linhaAbertasStr = linhaParcelasAbertas.select("td:nth-child(1) font b p:nth-child(2)").get(0).text();			
+			debitoAtual.setParcelasEmAberto(extrairListaInteiros(linhaAbertasStr));
+			
+		}
+		return debitoAtual;
+	}
+
+	private List<InformacaoDebito> extrairDebitosAnteriores(Document doc){
+		List<InformacaoDebito> debitosAnteriores = new ArrayList<InformacaoDebito>();		
+
+		Elements linhas = doc.select("table  table table tr:not(:nth-child(2n-1))");
+		
+		for(Element linha : linhas){
+			InformacaoDebito infoDebito = processarLinha(linha);
+			if(infoDebito != null){
+				debitosAnteriores.add(infoDebito);
+			}
+		}
+		
+		return debitosAnteriores;
+	} 
+	
+	private InformacaoDebito processarLinha(Element linha){
+		Integer exercicio = extrairValorInteger(linha, 1);
+		if(exercicio != null){
+			Double valor = extrairValorDouble(linha, 5);
+			if(valor != null){
+				String strPrestacoes = extrairValorLinha(linha, 7);
+				if(strPrestacoes != null){
+					Set<Integer> prestacoes = extrairListaInteiros(strPrestacoes);
+					InformacaoDebito infoDebito = new InformacaoDebito();
+					infoDebito.setAnoExercicio(2000+exercicio);
+					infoDebito.setParcelasVencidas(prestacoes);
+					infoDebito.setParcelasEmAberto(prestacoes);
+					infoDebito.setTotalDebito(valor);
+					return infoDebito;
+				}
+			}
+		}
+		return null;
+	}
 }
