@@ -42,8 +42,8 @@ private static ConsultarIptuSP consultarIptuSP;
 	 */
 	@Test
 	public void testConsulta1() throws IOException{
-		String strFile = readResourceFileAsString("iptu_teste_1.html");
-		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("016.065.0746-1", strFile, 2016);
+		String strFile = readResourceFileAsString("iptu_teste_1.html");		
+		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("016.065.0746-1",strFile, consultarIptuSP.parseDocument(strFile), 2016);
 		
 		Assert.assertEquals("016.065.0746-1", resposta.getCodigoContribuinte());
 		Assert.assertEquals(new Integer(2016), resposta.getAnoExercicioAtual());
@@ -76,7 +76,7 @@ private static ConsultarIptuSP consultarIptuSP;
 	@Test
 	public void testConsulta2() throws IOException{
 		String strFile = readResourceFileAsString("iptu_teste_2.html");
-		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("047.035.0409-1", strFile, 2016);
+		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("047.035.0409-1",strFile, consultarIptuSP.parseDocument(strFile), 2016);
 		
 		Assert.assertEquals("047.035.0409-1", resposta.getCodigoContribuinte());
 		Assert.assertEquals(new Integer(2016), resposta.getAnoExercicioAtual());
@@ -107,7 +107,7 @@ private static ConsultarIptuSP consultarIptuSP;
 	@Test
 	public void testConsulta3() throws IOException{
 		String strFile = readResourceFileAsString("iptu_teste_3.html");
-		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("011.150.0088-8", strFile, 2016);
+		RespostaConsultaDebito resposta = consultarIptuSP.gerarRespostaConsultaDebito("011.150.0088-8",strFile, consultarIptuSP.parseDocument(strFile), 2016);
 		
 		Assert.assertEquals("011.150.0088-8", resposta.getCodigoContribuinte());
 		Assert.assertEquals(new Integer(2016), resposta.getAnoExercicioAtual());

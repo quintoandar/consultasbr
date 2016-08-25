@@ -159,13 +159,12 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return false;
 	}
 
-	private List<Integer> getParcelasAberto(String htmlConsultaDebitos) {
+	private List<Integer> getParcelasAberto(Document doc) {
 
 		List<Integer> parcelasAberto = null;
 
-		if (htmlConsultaDebitos != null) {
+		if (doc != null) {
 			parcelasAberto = new ArrayList<Integer>();
-			Document doc = Jsoup.parse(htmlConsultaDebitos);
 			Elements elements = doc.select("tr > td[align=left] > font[size=2] > b > p");
 
 			if (elements != null && elements.size() > 0) {
@@ -181,13 +180,12 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return parcelasAberto;
 	}
 
-	private List<Integer> getParcelasVencida(String htmlConsultaDebitos) {
+	private List<Integer> getParcelasVencida(Document doc) {
 
 		List<Integer> parcelasVencida = null;
 
-		if (htmlConsultaDebitos != null) {
+		if (doc != null) {
 			parcelasVencida = new ArrayList<Integer>();
-			Document doc = Jsoup.parse(htmlConsultaDebitos);
 			Elements elements = doc.select("tr > td[align=left][width=75%] > font[size=2] > b");
 
 			if (elements != null && elements.size() > 0) {
@@ -273,10 +271,8 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return null;
 	}
 
-	private boolean isValidBoleto(String htmlConsultaBoleto) throws IPTUSPException {
-
-		if (htmlConsultaBoleto != null) {
-			Document doc = Jsoup.parse(htmlConsultaBoleto);
+	private boolean isValidBoleto(Document doc, String htmlConsultaBoleto) throws IPTUSPException {
+		if (doc != null) {
 			Elements elements = doc.select("#msg2");
 
 			if (elements != null && elements.size() > 0) {
@@ -295,14 +291,11 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return true;
 	}
 
-	private Date getVencimentoBoleto(String htmlConsultaBoleto) throws ParseException {
+	private Date getVencimentoBoleto(Document doc) throws ParseException {
 
 		Date dataValidade = null;
 
-		if (htmlConsultaBoleto != null) {
-
-			htmlConsultaBoleto = htmlConsultaBoleto.replaceAll("[\n\r]", "");
-			Document doc = Jsoup.parse(htmlConsultaBoleto.replaceAll("&nbsp;", " "));
+		if (doc != null) {
 			Elements fonts = doc.select("table > tbody > tr > td > font");
 
 			for (Element el : fonts) {
@@ -317,13 +310,11 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return dataValidade;
 	}
 
-	private Date getVencimentoOriginalBoleto(String htmlConsultaBoleto) throws ParseException {
+	private Date getVencimentoOriginalBoleto(Document doc) throws ParseException {
 
 		Date dataVectoOriginal = null;
 
-		if (htmlConsultaBoleto != null) {
-
-			Document doc = Jsoup.parse(htmlConsultaBoleto.replaceAll("&nbsp;", " "));
+		if (doc != null) {
 			Elements b = doc.select(
 					"td[colspan=3]:not([style=border: 0.04cm black solid;]) > table > tbody > tr > td[align=CENTER] > font > b");
 
@@ -337,15 +328,11 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return dataVectoOriginal;
 	}
 
-	private String getCodigoBoleto(String htmlConsultaBoleto) {
+	private String getCodigoBoleto(Document doc) {
 
 		String codigo = null;
 
-		if (htmlConsultaBoleto != null) {
-			htmlConsultaBoleto = htmlConsultaBoleto.replaceAll("[\n\r]", "");
-
-			Document doc = Jsoup.parse(htmlConsultaBoleto.replaceAll("&nbsp;", " "));
-
+		if (doc != null) {
 			Elements fonts = doc.select("table > tbody > tr > td > font");
 
 			Pattern p = Pattern.compile("([0-9]{12}) *([0-9]{12}) *([0-9]{12}) *([0-9]{12}) *([0-9]{12})");
@@ -362,29 +349,29 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		return codigo;
 	}
 
-	private Double getValorBase(String htmlConsultaBoleto) {
+	private Double getValorBase(Document doc) {
 		final Integer posicaoCelula = 2;
-		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+		return extrairValorColuna(doc, posicaoCelula);
 	}
 
-	private Double getMulta(String htmlConsultaBoleto) {
+	private Double getMulta(Document doc) {
 		final Integer posicaoCelula = 3;
-		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+		return extrairValorColuna(doc, posicaoCelula);
 	}
 
-	private Double getCorrecaoMonetaria(String htmlConsultaBoleto) {
+	private Double getCorrecaoMonetaria(Document doc) {
 		final Integer posicaoCelula = 4;
-		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+		return extrairValorColuna(doc, posicaoCelula);
 	}
 
-	private Double getJuros(String htmlConsultaBoleto) {
+	private Double getJuros(Document doc) {
 		final Integer posicaoCelula = 5;
-		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+		return extrairValorColuna(doc, posicaoCelula);
 	}
 
-	private Double getValorBoleto(String htmlConsultaBoleto) {
+	private Double getValorBoleto(Document doc) {
 		final Integer posicaoCelula = 7;
-		return extrairValorColuna(htmlConsultaBoleto, posicaoCelula);
+		return extrairValorColuna(doc, posicaoCelula);
 	}
 
 	/*
@@ -392,11 +379,10 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 	 * posição da célula, em que: 2 - Valor Base (ou principal) 3 - Multa 4 -
 	 * Correcao Monetaria 5 - Juros 7 - Valor total
 	 */
-	private Double extrairValorColuna(String htmlConsultaBoleto, Integer posicaoCelula) throws NumberFormatException {
+	private Double extrairValorColuna(Document doc, Integer posicaoCelula) throws NumberFormatException {
 		Double valorCampo = 0D;
 
-		if (htmlConsultaBoleto != null) {
-			Document doc = Jsoup.parse(htmlConsultaBoleto);
+		if (doc != null) {
 			Elements elements = doc.select(String.format("tbody tr:nth-child(%d) td[align=RIGHT]  b", posicaoCelula));
 
 			if (elements != null && elements.size() > 0) {
@@ -491,15 +477,16 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			String htmlRetorno;
 
 			htmlRetorno = this.consultaDebitos(codContribuinte);
+			Document doc = parseDocument(htmlRetorno);
 
 			Boolean hasDebitos = this.hasDebitos(htmlRetorno);
 
 			if (hasDebitos) {
 
 				// busca próximas parcelas
-				List<Integer> parcelasAberto = this.getParcelasAberto(htmlRetorno);
+				List<Integer> parcelasAberto = this.getParcelasAberto(doc);
 				// procura por lista de parcelas vencidas
-				List<Integer> parcelasVencida = this.getParcelasVencida(htmlRetorno);
+				List<Integer> parcelasVencida = this.getParcelasVencida(doc);
 
 				if (parcelasAberto != null && parcelasAberto.size() > 0) {
 					for (Integer p : parcelasAberto) {
@@ -554,9 +541,10 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 
 			String htmlRetorno = this.consultaDebitos(codContribuinte);
 			Boolean hasDebitos = this.hasDebitos(htmlRetorno);
-
+			Document doc = parseDocument(htmlRetorno);
+			
 			// procura por lista de parcelas vencidas
-			List<Integer> parcelasVencida = this.getParcelasVencida(htmlRetorno);
+			List<Integer> parcelasVencida = this.getParcelasVencida(doc);
 
 			if (hasDebitos) {
 
@@ -576,17 +564,17 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 			throws ClientProtocolException, IOException, IPTUSPException, ParseException {
 
 		String htmlRetorno = this.consultaBoleto(codContribuinte, parcela, anoExercicio);
+		Document doc = parseDocument(htmlRetorno);
+		if (this.isValidBoleto(doc, htmlRetorno)) {
 
-		if (this.isValidBoleto(htmlRetorno)) {
-
-			Date vencimentoBoleto = this.getVencimentoBoleto(htmlRetorno);
-			Double valorBoleto = this.getValorBoleto(htmlRetorno);
-			Double valorBase = this.getValorBase(htmlRetorno);
-			Double multa = this.getMulta(htmlRetorno);
-			Double correcaoMonetaria = this.getCorrecaoMonetaria(htmlRetorno);
-			Double juros = this.getJuros(htmlRetorno);
-			String codigoBoleto = this.getCodigoBoleto(htmlRetorno);
-			Date vencimentoOriginal = this.getVencimentoOriginalBoleto(htmlRetorno);
+			Date vencimentoBoleto = this.getVencimentoBoleto(doc);
+			Double valorBoleto = this.getValorBoleto(doc);
+			Double valorBase = this.getValorBase(doc);
+			Double multa = this.getMulta(doc);
+			Double correcaoMonetaria = this.getCorrecaoMonetaria(doc);
+			Double juros = this.getJuros(doc);
+			String codigoBoleto = this.getCodigoBoleto(doc);
+			Date vencimentoOriginal = this.getVencimentoOriginalBoleto(doc);
 
 			Resposta2ViaIPTU res = new Resposta2ViaIPTU(codContribuinte, anoExercicio, parcela);
 			res.setVencimento(vencimentoBoleto);
@@ -608,7 +596,8 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 		RespostaConsultaDebito resp = null;
 		try {
 			String htmlRetorno = this.consultaDebitos(codContribuinte);
-			resp = gerarRespostaConsultaDebito(codContribuinte, htmlRetorno, anoCorrente);
+			Document doc = parseDocument(htmlRetorno);
+			resp = gerarRespostaConsultaDebito(codContribuinte, htmlRetorno, doc, anoCorrente);
 		} catch (Throwable t) {
 			throw new IPTUSPException(t);
 		} finally {
@@ -619,15 +608,12 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 	}
 
 	// VisibleForTesting
-	protected RespostaConsultaDebito gerarRespostaConsultaDebito(String codigoContribuinte, String htmlStr,
+	protected RespostaConsultaDebito gerarRespostaConsultaDebito(String codigoContribuinte, String htmlStr, Document doc,
 			Integer anoCorrente) {
 		RespostaConsultaDebito resposta = null;
-		if (htmlStr != null) {
+		if (htmlStr != null && doc != null) {
 			resposta = new RespostaConsultaDebito(codigoContribuinte, anoCorrente);
 			resposta.sedtPossuiDebitos(Boolean.FALSE);
-
-			htmlStr = htmlStr.replaceAll("[\n\r]", "");
-			Document doc = Jsoup.parse(htmlStr.replaceAll("&nbsp;", " "));
 
 			if (this.hasDebitos(htmlStr)) {
 				resposta.sedtPossuiDebitos(Boolean.TRUE);
@@ -698,6 +684,15 @@ public class ConsultarIptuSP extends SimpleHttpQuerier {
 					return infoDebito;
 				}
 			}
+		}
+		return null;
+	}
+	
+	protected Document parseDocument(String htmlStr) {
+		if (htmlStr != null) {
+			htmlStr = htmlStr.replaceAll("[\n\r]", "");
+			Document doc = Jsoup.parse(htmlStr.replaceAll("&nbsp;", " "));
+			return doc;
 		}
 		return null;
 	}
