@@ -5,7 +5,7 @@
 
 	<groupId>br.com.quintoandar</groupId>
 	<artifactId>consultasbr</artifactId>
-	<version>1.6.1-SNAPSHOT</version>
+	<version>1.7.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>ConsultasBR - Quinto Andar</name>
 	<dependencies>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -101,7 +101,7 @@
 	<!-- Configuracoes de variaveis do maven -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jdk.version>1.6</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		<internal.repo.path>${basedir}/../../mvn-repo/</internal.repo.path>
 	</properties>
 

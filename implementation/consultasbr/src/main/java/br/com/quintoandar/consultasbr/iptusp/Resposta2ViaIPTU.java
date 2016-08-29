@@ -31,7 +31,7 @@ public class Resposta2ViaIPTU implements Serializable {
 	private Double juros = 0.0D;
 	
 	private Double valorBase;
-
+	
 	public Resposta2ViaIPTU(String codigoContribuinte, Integer anoExercicio, Integer numParcela) {
 		super();
 		this.codigoContribuinte = codigoContribuinte;
