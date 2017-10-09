@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -51,7 +52,8 @@ public class IGPMReader extends SimpleHttpQuerier {
 			resp.getEntity().writeTo(baos);
 			String retorno = new String(baos.toByteArray(), "ISO-8859-1");
 			Document doc = Jsoup.parse(retorno);
-			Elements media = doc.select("script[src*=js-inf/igp-m-fgv]");
+			int year = Calendar.getInstance().get(Calendar.YEAR);
+			Elements media = doc.select("script[src*=js-inf/igpmf-"+year+"]");
 			Element ultimoIgpm = media.get(0);
 
 			String scriptSrc = ultimoIgpm.attr("src").trim();
