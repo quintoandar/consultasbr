@@ -38,7 +38,6 @@ public class IGPMReader extends SimpleHttpQuerier {
 	public Date mes;
 
 	String buscar() {
-		// this.P
 		// buscar indice pela url
 		HttpGet httpGet = new HttpGet(HTTP_PORTALDEFINANCAS_COM+"igp_m_fgv.htm");
 		httpGet.setHeader("User-Agent", USER_AGENT);
@@ -52,7 +51,12 @@ public class IGPMReader extends SimpleHttpQuerier {
 			resp.getEntity().writeTo(baos);
 			String retorno = new String(baos.toByteArray(), "ISO-8859-1");
 			Document doc = Jsoup.parse(retorno);
-			int year = Calendar.getInstance().get(Calendar.YEAR);
+
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Date());
+			c.add(Calendar.MONTH, -1);
+			int year = c.get(Calendar.YEAR);
+
 			Elements media = doc.select("script[src*=js-inf/igpmf-"+year+"]");
 			Element ultimoIgpm = media.get(0);
 
