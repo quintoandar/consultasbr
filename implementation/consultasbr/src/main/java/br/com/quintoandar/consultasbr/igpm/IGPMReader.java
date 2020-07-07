@@ -1,8 +1,10 @@
 package br.com.quintoandar.consultasbr.igpm;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,15 +13,15 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.HttpResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import br.com.quintoandar.consultasbr.core.SimpleHttpQuerier;
+
 /**
  * @author <a href="mpereira@quintoandar.com.br">Moacyr</a>
  **/
@@ -27,8 +29,6 @@ public class IGPMReader extends SimpleHttpQuerier {
 
 	private static final String HTTP_PORTALDEFINANCAS_COM = "http://portaldefinancas.com/";
 
-	private static final String USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/34.0.1847.116 Chrome/34.0.1847.116 Safari/537.36";
-	
 	private SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy",new Locale("pt", "BR"));
 
 	public BigDecimal mensal;
@@ -38,52 +38,18 @@ public class IGPMReader extends SimpleHttpQuerier {
 	public Date mes;
 
 	String buscar() {
-		// buscar indice pela url
-		HttpGet httpGet = new HttpGet(HTTP_PORTALDEFINANCAS_COM+"igp_m_fgv.htm");
-		httpGet.setHeader("User-Agent", USER_AGENT);
-		httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-		httpGet.setHeader("Accept-Language", "en-US,en;q=0.8");
-		httpGet.setHeader("Accept-Encoding", "gzip,deflate,sdch");
-
 		try {
-			HttpResponse resp = client.execute(httpGet);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			resp.getEntity().writeTo(baos);
-			String retorno = new String(baos.toByteArray(), "ISO-8859-1");
-			Document doc = Jsoup.parse(retorno);
-
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Date());
 			c.add(Calendar.MONTH, -1);
 			int year = c.get(Calendar.YEAR);
 
-			Elements media = doc.select("script[src*=js-inf/igpmf-"+year+"]");
-			Element ultimoIgpm = media.get(0);
+			String scriptSrc = HTTP_PORTALDEFINANCAS_COM + "/js-inf/igpmf-" + year + ".js";
 
-			String scriptSrc = ultimoIgpm.attr("src").trim();
-			if(scriptSrc.matches("^/.*") || !scriptSrc.matches("^(www|http://).*")){
-				scriptSrc = HTTP_PORTALDEFINANCAS_COM.replaceAll("/+$","")+"/"+scriptSrc.replaceAll("^/+","");
-			}
-			
-			httpGet = new HttpGet(scriptSrc);
-			httpGet.setHeader("User-Agent", USER_AGENT);
-			httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-			httpGet.setHeader("Accept-Language", "en-US,en;q=0.8");
-			httpGet.setHeader("Accept-Encoding", "gzip,deflate,sdch");
-
-			resp = client.execute(httpGet);
-			baos = new ByteArrayOutputStream();
-			resp.getEntity().writeTo(baos);
-			retorno = new String(baos.toByteArray(), "ISO-8859-1");
-
-//			'forcing' gc
-			ultimoIgpm = null;
-			media = null;
-			doc = null;
-			baos = null;
-			
-//			processar(retorno);
-			return retorno;
+			URL url = new URL(scriptSrc);
+			URLConnection con = url.openConnection();
+			InputStream in = con.getInputStream();
+			return IOUtils.toString(in, "UTF-8");
 		} catch (ClientProtocolException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -110,7 +76,6 @@ public class IGPMReader extends SimpleHttpQuerier {
 				break;
 			}
 		}
-//		retorno = retorno.replaceAll(regex, replacement)
 	}
 	
 	public void processar(){
