@@ -26,7 +26,7 @@ public class IGPMReaderTest {
 		is.close();
 		baos.close();
 		
-		r.processarIgpm(new String(baos.toByteArray(),"utf8"));
+		r.processar(new String(baos.toByteArray(),"utf8"));
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		assertEquals(sdf.parse("01/02/2015"),r.getMes());
