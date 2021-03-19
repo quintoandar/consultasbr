@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ConsultarPFTest {
@@ -24,6 +25,7 @@ public class ConsultarPFTest {
 		return JOptionPane.showInputDialog(jLabel);
 	}
 
+	@Ignore("Analyze if this test should still exist")
 	@Test
 	public void testConsultaFernandinhoBeiraMar() {
 		RespostaCaptcha captcha = consultarPF.requestCaptcha();
@@ -38,6 +40,7 @@ public class ConsultarPFTest {
 		Assert.assertNotNull(ra.getPdf());
 	}
 
+	@Ignore("Analyze if this test should still exist")
 	@Test
 	public void testConsultaLula() {
 		RespostaCaptcha captcha = consultarPF.requestCaptcha();
@@ -52,6 +55,7 @@ public class ConsultarPFTest {
 		Assert.assertNotNull(ra.getPdf());
 	}
 
+	@Ignore("Analyze if this test should still exist")
 	@Test
 	public void testWrongCaptcha() {
 		RespostaCaptcha captcha = consultarPF.requestCaptcha();

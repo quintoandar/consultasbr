@@ -1,9 +1,11 @@
 package br.com.quintoandar.consultasbr.crecisp;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+@Ignore("Analyze if these tests should still exist")
 public class ConsultarCreciTest {
 	
 	ConsultarCreci consultarCreci;

@@ -3,6 +3,7 @@
   <groupId>br.com.quintoandar</groupId>
   <artifactId>consultasbr</artifactId>
   <versioning>
+    <release>1.7.5</release>
     <versions>
       <version>1.4.0-SNAPSHOT</version>
       <version>1.4.1-SNAPSHOT</version>
@@ -17,7 +18,8 @@
       <version>1.7.2-SNAPSHOT</version>
       <version>1.7.3-SNAPSHOT</version>
       <version>1.7.4-SNAPSHOT</version>
+      <version>1.7.5</version>
     </versions>
-    <lastUpdated>20200707154737</lastUpdated>
+    <lastUpdated>20210319222800</lastUpdated>
   </versioning>
 </metadata>

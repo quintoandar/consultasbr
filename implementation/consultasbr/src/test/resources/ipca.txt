@@ -1,0 +1,3 @@
+//<tr class="tr02" onMouseOver="change(this,&#39;omo&#39;);" onMouseOut="change(this,&#39;tr02&#39;);"><tr class="tr03" onMouseOver="change(this,&#39;omo&#39;);" onMouseOut="change(this,&#39;tr03&#39;);"><td class="td04">/2015</td><td></td><td></td><td></td><td></td></tr>
+document.write('')
+document.write('<tr class="tr03" onMouseOver="change(this,&#39;omo&#39;);" onMouseOut="change(this,&#39;tr03&#39;);"><td class="td04">Fev/2015</td><td>0,27</td><td>1,0321</td><td>3,8499</td><td>1.357,1540</td></tr><tr class="tr02" onMouseOver="change(this,&#39;omo&#39;);" onMouseOut="change(this,&#39;tr02&#39;);"><td class="td04">Jan/2015</td><td>0,76</td><td>0,7600</td><td>3,9638</td><td>1.353,4995</td></tr></table></td></tr></table>')

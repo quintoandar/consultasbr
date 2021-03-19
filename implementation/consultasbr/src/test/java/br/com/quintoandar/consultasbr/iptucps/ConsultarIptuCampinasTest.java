@@ -1,34 +1,24 @@
 package br.com.quintoandar.consultasbr.iptucps;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import org.apache.http.client.ClientProtocolException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import br.com.quintoandar.consultasbr.iptusp.ConsultarIptuCampinas;
 import br.com.quintoandar.consultasbr.iptusp.ConsultarIptuCampinas.ConsultaBoletoResult;
 import br.com.quintoandar.consultasbr.iptusp.IPTUSPException;
 import br.com.quintoandar.consultasbr.iptusp.Resposta2ViaIPTU;
-import br.com.quintoandar.consultasbr.pf.ConsultaAntecedentes;
-import br.com.quintoandar.consultasbr.pf.ConsultarPF;
 import br.com.quintoandar.consultasbr.pf.RespostaCaptcha;
-import br.com.quintoandar.consultasbr.pf.ResultadoAntecedentes;
-import br.com.quintoandar.consultasbr.pf.StatusAntecedentes;
+import org.apache.http.client.ClientProtocolException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+@Ignore("Analyze if these tests should still exist")
 public class ConsultarIptuCampinasTest {
 
 	private static ConsultarIptuCampinas consultarIptuCampinas;
