@@ -12,7 +12,7 @@ import org.junit.Test;
 public class IPCAReaderTest {
 
     @Test
-    public void testProcessarIGPM() throws Throwable {
+    public void testProcessarIPCA() throws Throwable {
         IPCAReader r = new IPCAReader();
         InputStream is = IPCAReader.class.getResourceAsStream("/ipca.txt");
 
