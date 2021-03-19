@@ -1,25 +1,27 @@
 package br.com.quintoandar.consultasbr.receita;
 
-import static org.junit.Assert.*;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import br.com.quintoandar.consultasbr.pf.RespostaCaptcha;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
-import br.com.quintoandar.consultasbr.pf.ConsultarPF;
-import br.com.quintoandar.consultasbr.pf.RespostaCaptcha;
 
 /**
  * TODOS OS CPFs usados nesses testes foram achados com a busca: <i>cpf nome</i> no google.
  * @author <a href="mailto:mpereira@quintoandar.com.br">moa</a>
  *
  */
+@Ignore("Analyze if these tests should still exist")
 public class ConsultarReceitaTest {
 	private static ConsultarReceita consultarReceita;
 	
