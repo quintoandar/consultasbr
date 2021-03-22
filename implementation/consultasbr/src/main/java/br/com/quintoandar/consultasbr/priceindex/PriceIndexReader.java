@@ -1,4 +1,4 @@
-package br.com.quintoandar.consultasbr.core;
+package br.com.quintoandar.consultasbr.priceindex;
 
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -20,7 +19,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class IndicePrecoReader {
+public abstract class PriceIndexReader {
+
     private static final String HTTP_PORTALDEFINANCAS_COM = "http://portaldefinancas.com/";
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy",new Locale("pt", "BR"));
 
@@ -28,9 +28,21 @@ public abstract class IndicePrecoReader {
     private BigDecimal acumulado;
     private Date mes;
 
-    public IndicePrecoReader() {
+    public void crawl() {
+        int numMesesOffset = this.getNumMesesOffset();
+        String javascriptFilename = this.getJavascriptFilename();
+
+        String retorno = this.buscar(numMesesOffset, javascriptFilename);
+
+        this.processar(retorno);
     }
-    public String buscar(int numMesesOffset, String javascriptFilename) {
+
+    protected abstract String getJavascriptFilename();
+
+    protected abstract int getNumMesesOffset();
+
+
+    private String buscar(int numMesesOffset, String javascriptFilename) {
         try {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
@@ -42,14 +54,14 @@ public abstract class IndicePrecoReader {
             URL url = new URL(scriptSrc);
             URLConnection con = url.openConnection();
             InputStream in = con.getInputStream();
-            return IOUtils.toString(in, StandardCharsets.UTF_8);
+            return IOUtils.toString(in, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public void processar(String retorno) {
+    protected void processar(String retorno) {
         try {
             Pattern p = Pattern.compile("document\\.write\\('(.+)'\\)");
             Matcher mat = p.matcher(retorno);
