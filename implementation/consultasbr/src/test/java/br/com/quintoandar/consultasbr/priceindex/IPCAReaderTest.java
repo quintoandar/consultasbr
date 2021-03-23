@@ -1,13 +1,13 @@
-package br.com.quintoandar.consultasbr.ipca;
+package br.com.quintoandar.consultasbr.priceindex;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class IPCAReaderTest {
 
