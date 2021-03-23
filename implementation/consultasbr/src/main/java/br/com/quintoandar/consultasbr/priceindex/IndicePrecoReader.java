@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class PriceIndexReader {
+public abstract class IndicePrecoReader {
 
     private static final String HTTP_PORTALDEFINANCAS_COM = "http://portaldefinancas.com/";
     private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy",new Locale("pt", "BR"));
@@ -28,6 +28,11 @@ public abstract class PriceIndexReader {
     private BigDecimal acumulado;
     private Date mes;
 
+    /**
+     * Método responsável por buscar o índice de preço mais recente.
+     * Após recuperar os valores do índice,
+     * os mesmos são definidos em suas respectivas propriedades para um posterior uso.
+     */
     public void crawl() {
         int numMesesOffset = this.getNumMesesOffset();
         String javascriptFilename = this.getJavascriptFilename();
@@ -42,7 +47,7 @@ public abstract class PriceIndexReader {
     protected abstract int getNumMesesOffset();
 
 
-    private String buscar(int numMesesOffset, String javascriptFilename) {
+    public String buscar(int numMesesOffset, String javascriptFilename) {
         try {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());

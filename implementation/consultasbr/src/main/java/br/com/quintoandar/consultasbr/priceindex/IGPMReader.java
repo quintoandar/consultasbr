@@ -3,7 +3,7 @@ package br.com.quintoandar.consultasbr.priceindex;
 /**
  * @author <a href="mpereira@quintoandar.com.br">Moacyr</a>
  **/
-public class IGPMReader extends PriceIndexReader {
+public class IGPMReader extends IndicePrecoReader {
 
 	@Override
 	protected String getJavascriptFilename() {

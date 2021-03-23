@@ -1,6 +1,6 @@
 package br.com.quintoandar.consultasbr.priceindex;
 
-public class IPCAReader extends PriceIndexReader {
+public class IPCAReader extends IndicePrecoReader {
 
     @Override
     protected String getJavascriptFilename() {
